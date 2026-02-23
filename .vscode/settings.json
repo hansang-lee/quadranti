@@ -1,0 +1,66 @@
+{
+    "cmake.buildDirectory": "${workspaceFolder}/build/${buildType}",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.cursorBlinking": "solid",
+    "editor.detectIndentation": false,
+    "editor.fontFamily": "Fira Code, Victor Mono, Mono Space",
+    "editor.fontLigatures": true,
+    "editor.fontSize": 14,
+    "editor.fontWeight": "normal",
+    "editor.insertSpaces": true,
+    "editor.lineHeight": 0,
+    "editor.minimap.enabled": false,
+    "editor.multiCursorModifier": "alt",
+    "editor.renderWhitespace": "boundary",
+    "editor.rulers": [
+        120
+    ],
+    "editor.trimAutoWhitespace": false,
+    "editor.wordBasedSuggestions": "matchingDocuments",
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 120,
+    "explorer.autoReveal": false,
+    "explorer.openEditors.sortOrder": "alphabetical",
+    "explorer.sortOrder": "default",
+    "extensions.ignoreRecommendations": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "terminal.integrated.fontFamily": "monospace",
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontWeight": "400",
+    "terminal.integrated.fontWeightBold": "300",
+    "terminal.integrated.scrollback": 5000,
+    "terminal.integrated.suggest.enabled": false,
+    "window.title": "${activeEditorLong}",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.colorCustomizations": {
+        "editor.lineHighlightBackground": "#264f7844",
+        "editor.lineHighlightBorder": "#00000000"
+    },
+    "[cpp]": {
+        "editor.formatOnSave": true,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+    },
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    },
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+    },
+    "[cmake]": {
+        "editor.formatOnSave": false,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2
+    },
+    "[dockerfile]": {
+        "editor.formatOnSave": false,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    }
+}
