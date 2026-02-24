@@ -74,11 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF3F51B5), Color(0xFF1A237E)],
-          ),
+          color: Color(0xFF3F51B5),
         ),
         child: SafeArea(
           child: Center(
@@ -173,6 +169,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Toggle Login / Signup
                   TextButton(
                     onPressed: () => setState(() => _isSignUp = !_isSignUp),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white.withOpacity(0.5),
+                      overlayColor: Colors.white.withOpacity(0.05),
+                    ),
                     child: Text(
                       _isSignUp ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 회원가입',
                       style: TextStyle(color: Colors.white.withOpacity(0.8)),
@@ -197,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: double.infinity,
                     height: 48,
-                    child: OutlinedButton.icon(
+                    child: ElevatedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Google 로그인은 추후 연동 예정입니다')),
@@ -205,12 +205,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       icon: SvgPicture.asset('assets/images/google-48x48.svg', width: 20, height: 20),
                       label: const Text('Google로 로그인', style: TextStyle(fontSize: 14)),
-                      style: OutlinedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.2),
                         foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                        overlayColor: Colors.white.withOpacity(0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                        surfaceTintColor: Colors.transparent,
                       ),
                     ),
                   ),
@@ -220,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: double.infinity,
                     height: 48,
-                    child: OutlinedButton.icon(
+                    child: ElevatedButton.icon(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('카카오 로그인은 추후 연동 예정입니다')),
@@ -228,12 +232,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       icon: Image.asset('assets/images/kakaotalk-48x48.png', width: 20, height: 20),
                       label: const Text('카카오로 로그인', style: TextStyle(fontSize: 14)),
-                      style: OutlinedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.2),
                         foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                        overlayColor: Colors.white.withOpacity(0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                        surfaceTintColor: Colors.transparent,
                       ),
                     ),
                   ),
