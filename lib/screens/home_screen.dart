@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
+import '../providers/auth_provider.dart';
 import 'graph_view.dart';
 import 'list_view.dart';
 
@@ -13,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  
+
   static final List<Widget> _widgetOptions = <Widget>[
     const GraphView(),
     const TaskListView(),
@@ -29,16 +30,24 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // Load dummy data for visualization
-    Future.microtask(() => 
+    Future.microtask(() =>
       Provider.of<TaskProvider>(context, listen: false).loadDummyData()
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quadranti'),
+        title: Text('Quadranti — ${auth.currentUser?.displayName ?? ''}'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: '로그아웃',
+            onPressed: () => auth.signOut(),
+          ),
+        ],
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
