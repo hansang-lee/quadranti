@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/week_format.dart';
 import '../providers/task_provider.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/week_summary.dart';
 import 'graph_view.dart';
 import 'list_view.dart';
 import 'task_editor_screen.dart';
@@ -99,7 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: tasks.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _widgetOptions.elementAt(_selectedIndex),
+          : Column(
+              children: [
+                if (tasks.weekTasks.isNotEmpty) WeekSummary(tasks: tasks.weekTasks),
+                Expanded(child: _widgetOptions.elementAt(_selectedIndex)),
+              ],
+            ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

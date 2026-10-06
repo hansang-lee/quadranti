@@ -60,9 +60,9 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 - [ ] 3.1 👤 Settle **D1** (the axis formula), after a week of real use.
 - [x] 3.2 Bundle IBM Plex Sans KR (400 and 700) and drop `google_fonts` (D6). `b139ec2`
-- [x] 3.10 Tasks with the same scores share one dot: titles stacked beside it ("외 n개" past three), and a tap asks which task to open.
+- [x] 3.10 Tasks with the same scores share one dot: titles stacked beside it ("외 n개" past three), and a tap asks which task to open. `fa9263b`
 - [ ] 3.3 Onboarding: one screen that explains the four properties and the quadrants, shown on first sign-in and reachable from the menu.
-- [ ] 3.4 Week summary bar: count per quadrant and the done ratio for the selected week, shown above the graph or list.
+- [x] 3.4 Week summary bar above the graph and list: count per quadrant and 완료 n/m. It wraps on narrow screens.
 - [ ] 3.5 At the start of a new week, offer to carry over last week's unfinished tasks, instead of relying only on the menu.
 - [ ] 3.6 Drag a point on the graph to re-rate a task, so the four scores scale to match. Needs a rule for splitting a point move between the two properties of each axis. Do this after D1.
 - [ ] 3.7 Optional day of the week (월–일) for a task, with a filter in the list. This extends D2, so record the decision first.

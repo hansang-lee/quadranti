@@ -91,15 +91,18 @@ void main() {
     expect(tasks.weekTasks, hasLength(4));
   });
 
-  testWidgets('checkbox marks a task done', (tester) async {
+  testWidgets('checkbox marks a task done and the summary counts it', (tester) async {
     await pumpHome(tester);
     await tasks.loadSampleData();
     await tester.tap(find.text('목록'));
     await tester.pumpAndSettle();
+    expect(find.text('완료 0/4'), findsOneWidget);
+    expect(find.text('집중 1'), findsOneWidget);
 
     await tester.tap(find.byType(Checkbox).first);
     await tester.pumpAndSettle();
     expect(tasks.weekTasks.where((t) => t.done), hasLength(1));
+    expect(find.text('완료 1/4'), findsOneWidget);
   });
 
   testWidgets('week arrows move between weeks', (tester) async {
@@ -135,5 +138,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('태스크 편집'), findsOneWidget);
     expect(find.widgetWithText(TextField, '둘'), findsOneWidget);
+  });
+
+  testWidgets('summary fits a narrow 320px screen', (tester) async {
+    await pumpHome(tester);
+    tester.view.physicalSize = const Size(320, 640);
+    await tasks.loadSampleData();
+    await tester.pumpAndSettle();
+    expect(find.text('완료 0/4'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
