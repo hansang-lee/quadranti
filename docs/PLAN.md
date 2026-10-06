@@ -32,11 +32,11 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 - The editor has a title, a memo and four 0–10 sliders with help text. A live
   card shows the resulting quadrant and x/y.
 - Menu: 사용법 (the guide, also shown once per user on arrival), carrying
-  unfinished tasks over to the next week, sample tasks, clipboard JSON backup
-  export and import, and sign-out.
+  unfinished tasks over to the next week, sample tasks, 백업 (a JSON file or
+  the clipboard, both ways), and sign-out. Tasks can repeat weekly (D10).
 - Dark mode follows the system. IBM Plex Sans KR is bundled. The app icon
   shows the four quadrant colours.
-- 61 tests (model, week helpers, provider including race cases, the Hive
+- 75 tests (model, week helpers, provider including race cases, the Hive
   repository, local auth, backup, painter, widget flows). CI runs analyze,
   test and the web build on every push. The debug APK builds locally.
 - Seen in a real browser at phone size (light and dark) with
@@ -86,8 +86,8 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 ## Phase 4: Data safety and accounts
 
 - [x] 4.1 JSON backup through the clipboard (now under 메뉴 → 백업). Import merges by id and never deletes. Format: `TaskBackup` (`lib/services/task_backup.dart`), version 1. `6eb13e0`
-- [x] 4.1b Back up to and restore from a `.json` file (메뉴 → 백업 → 파일로 저장 / 파일에서 불러오기) with `file_picker`: a download on web, the system save and open dialogs on Android. `lib/services/backup_files.dart` is the seam that tests replace. Web download was checked in headless Chrome; Android so far only builds.
-- [ ] 4.2 Repeating tasks (weekly), created when a week is first opened.
+- [x] 4.1b Back up to and restore from a `.json` file (메뉴 → 백업 → 파일로 저장 / 파일에서 불러오기) with `file_picker`: a download on web, the system save and open dialogs on Android. `lib/services/backup_files.dart` is the seam that tests replace. Web download was checked in headless Chrome; Android so far only builds. `a1b7240`
+- [x] 4.2 Weekly repeating tasks (D10): a 매주 반복 switch in the editor and a 매주 mark in the list. Rules are stored per user and included in backups (version 2).
 - [ ] 4.3 👤 Settle **D4** (keep or drop the local login).
 - [ ] 4.4 👤 Choose a sync backend (e.g. reuse the cling Go/Postgres setup, Supabase or Firebase). This decides the cost and the accounts needed.
 - [ ] 4.5 Google and Kakao sign-in through a real `AuthService` implementation. Needs 4.4 and per-platform OAuth clients (👤).

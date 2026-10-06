@@ -40,11 +40,12 @@ String backupFileName(DateTime now) => 'quadranti-backup-${formatDateKey(now)}.j
 
 /// Saves every task of the current user (all weeks) as a JSON file.
 Future<void> saveBackupFile(BuildContext context) async {
-  final tasks = context.read<TaskProvider>().tasks;
+  final provider = context.read<TaskProvider>();
+  final tasks = provider.tasks;
   final messenger = ScaffoldMessenger.of(context);
   bool saved;
   try {
-    saved = await backupFiles.save(backupFileName(DateTime.now()), TaskBackup.encode(tasks));
+    saved = await backupFiles.save(backupFileName(DateTime.now()), TaskBackup.encode(tasks, rules: provider.rules));
   } catch (e) {
     _show(messenger, '파일을 저장하지 못했습니다: $e');
     return;
@@ -59,7 +60,8 @@ Future<void> openBackupFile(BuildContext context) async {
   try {
     final text = await backupFiles.open();
     if (text == null) return;
-    final result = await provider.importTasks(TaskBackup.decode(text));
+    final contents = TaskBackup.decode(text);
+    final result = await provider.importTasks(contents.tasks, rules: contents.rules);
     _show(messenger, _importedMessage(result));
   } on FormatException catch (e) {
     _show(messenger, e.message);
@@ -77,9 +79,10 @@ void _show(ScaffoldMessengerState messenger, String text) => messenger
 
 /// Copies every task of the current user (all weeks) to the clipboard.
 Future<void> exportBackup(BuildContext context) async {
-  final tasks = context.read<TaskProvider>().tasks;
+  final provider = context.read<TaskProvider>();
+  final tasks = provider.tasks;
   final messenger = ScaffoldMessenger.of(context);
-  await Clipboard.setData(ClipboardData(text: TaskBackup.encode(tasks)));
+  await Clipboard.setData(ClipboardData(text: TaskBackup.encode(tasks, rules: provider.rules)));
   _show(messenger, '태스크 ${tasks.length}개를 클립보드에 복사했습니다. 메모 앱 등에 붙여 넣어 보관하세요.');
 }
 
@@ -115,8 +118,8 @@ class _ImportDialogState extends State<_ImportDialog> {
   Future<void> _import() async {
     setState(() => _busy = true);
     try {
-      final tasks = TaskBackup.decode(_text.text);
-      final result = await context.read<TaskProvider>().importTasks(tasks);
+      final contents = TaskBackup.decode(_text.text);
+      final result = await context.read<TaskProvider>().importTasks(contents.tasks, rules: contents.rules);
       if (mounted) Navigator.pop(context, result);
     } on FormatException catch (e) {
       setState(() {

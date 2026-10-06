@@ -15,6 +15,7 @@ and never renumber them.
 | D7 | 2026-10-07 | Default | The app UI is in Korean. Code, comments, docs and commit messages are in English. |
 | D8 | 2026-10-07 | Default | Platforms are **web and Android**. iOS is added when there is a Mac to build on. |
 | D9 | 2026-10-07 | Default | Sample tasks are never seeded on their own. An empty week shows a button that adds them. |
+| D10 | 2026-10-07 | Default | Repeating tasks are **weekly only**. Each rule (`RepeatRule`, box `repeats_<userId>`) holds a task template and `lastWeek`. When the real calendar week is later than `lastWeek`, it creates one open instance for that week, with the id `<rule id>-<yyyy-MM-dd>`. Missed weeks are not back-filled. Editing any instance updates the template. Deleting an instance leaves the series running, and switching off 매주 반복 deletes the rule but keeps the instances. Carry-over skips a repeating task when its series is already in the target week. Backups are at version 2 and carry the rules; version 1 is still read. |
 
 ## D1: axis formula (open)
 

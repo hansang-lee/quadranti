@@ -38,9 +38,11 @@ lib/
   main.dart                  creates AuthProvider + TaskProvider; auth changes call tasks.setUser
   core/                      constants, theme, week helpers (week.dart, week_format.dart), quadrant colours/advice
   models/task_model.dart     Task (immutable, toMap/fromMap), Quadrant enum, the axis formula
+  models/repeat_rule.dart    RepeatRule (weekly repeat template + lastWeek, D10)
   models/user_model.dart     User
   providers/                 AuthProvider, TaskProvider (state for the selected week; writes go through TaskRepository)
   services/                  AuthService + LocalAuthService (Hive), TaskRepository + Hive/Memory implementations
+                             (tasks and repeat rules), TaskBackup (JSON v2), BackupFiles (file_picker seam), Prefs
   screens/                   login, home (week bar, menu, FAB), graph_view, list_view, task_editor_screen
   widgets/                   QuadrantPainter (drawing, groupByPosition, tasksAt hit test), EmptyWeek
 test/                        one file per unit; app_flow_test.dart drives HomeScreen end to end

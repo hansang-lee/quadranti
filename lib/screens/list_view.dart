@@ -85,6 +85,22 @@ class _TaskTile extends StatelessWidget {
     ));
   }
 
+  Widget? _subtitle(BuildContext context) {
+    final repeating = context.read<TaskProvider>().isRepeating(task);
+    if (task.description.isEmpty && !repeating) return null;
+    return Row(
+      children: [
+        if (repeating) ...[
+          Icon(Icons.repeat, size: 14, key: Key('repeatIcon_${task.id}')),
+          const SizedBox(width: 4),
+          if (task.description.isEmpty) const Text('매주'),
+        ],
+        if (task.description.isNotEmpty)
+          Expanded(child: Text(task.description, maxLines: 1, overflow: TextOverflow.ellipsis)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -112,9 +128,7 @@ class _TaskTile extends StatelessWidget {
                 )
               : null,
         ),
-        subtitle: task.description.isEmpty
-            ? null
-            : Text(task.description, maxLines: 1, overflow: TextOverflow.ellipsis),
+        subtitle: _subtitle(context),
         trailing: CircleAvatar(
           radius: 12,
           backgroundColor: task.quadrant.color,

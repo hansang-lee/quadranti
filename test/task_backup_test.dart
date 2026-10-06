@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quadranti/models/repeat_rule.dart';
 import 'package:quadranti/models/task_model.dart';
 import 'package:quadranti/providers/task_provider.dart';
 import 'package:quadranti/services/task_backup.dart';
@@ -9,12 +10,22 @@ void main() {
   final b = Task(id: 'b', title: '나', done: true, weekStart: DateTime(2026, 10, 12), createdAt: DateTime(2026, 10, 2));
 
   test('round trip', () {
-    expect(TaskBackup.decode(TaskBackup.encode([a, b])), [a, b]);
+    final rule = RepeatRule.fromTask(a.copyWith(seriesId: 'a'));
+    final decoded = TaskBackup.decode(TaskBackup.encode([a, b], rules: [rule]));
+    expect(decoded.tasks, [a, b]);
+    expect(decoded.rules, [rule]);
   });
 
   test('a duplicated id keeps its last entry', () {
     final text = TaskBackup.encode([a, a.copyWith(title: 'later')]);
-    expect(TaskBackup.decode(text).map((t) => t.title), ['later']);
+    expect(TaskBackup.decode(text).tasks.map((t) => t.title), ['later']);
+  });
+
+  test('version 1 backups (no repeats) still load', () {
+    final v1 = '{"app": "quadranti", "version": 1, "tasks": [{"id": "x", "title": "old"}]}';
+    final decoded = TaskBackup.decode(v1);
+    expect(decoded.tasks.single.title, 'old');
+    expect(decoded.rules, isEmpty);
   });
 
   test('rejects bad input with a user-facing message', () {
@@ -28,6 +39,7 @@ void main() {
     rejects('{"app": "quadranti", "version": 99, "tasks": []}', '더 새로운 버전의 앱에서 만든 백업입니다');
     rejects('{"app": "quadranti", "version": 1, "tasks": [{"title": "no id"}]}', '백업에 잘못된 태스크가 있습니다');
     rejects('{"app": "quadranti", "version": 1, "tasks": [{"id": "x", "immediacy": "high"}]}', '백업에 잘못된 태스크가 있습니다');
+    rejects('{"app": "quadranti", "version": 2, "tasks": [], "repeats": [{"id": "r"}]}', '백업에 잘못된 반복 규칙이 있습니다');
   });
 
   test('import merges by id and persists', () async {

@@ -31,6 +31,8 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
   late double _effectiveness;
   late double _waste;
   late double _illusion;
+  late bool _repeat;
+  late bool _wasRepeating;
 
   bool get _isNew => widget.task == null;
 
@@ -44,6 +46,8 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
     _effectiveness = t?.effectiveness ?? 5;
     _waste = t?.waste ?? 0;
     _illusion = t?.illusion ?? 0;
+    _wasRepeating = t != null && context.read<TaskProvider>().isRepeating(t);
+    _repeat = _wasRepeating;
   }
 
   @override
@@ -87,6 +91,10 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
     } else {
       await tasks.updateTask(task);
     }
+    if (_repeat != _wasRepeating) {
+      final saved = tasks.byId(task.id);
+      if (saved != null) await tasks.setRepeat(saved, _repeat);
+    }
     navigator.pop();
   }
 
@@ -95,7 +103,9 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('태스크 삭제'),
-        content: Text('"${widget.task!.title}"을(를) 삭제할까요?'),
+        content: Text(_wasRepeating
+            ? '"${widget.task!.title}"의 이번 주 항목을 삭제할까요?\n반복은 계속됩니다. 멈추려면 \'매주 반복\'을 끄세요.'
+            : '"${widget.task!.title}"을(를) 삭제할까요?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
           TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('삭제')),
@@ -148,7 +158,16 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
             maxLines: 3,
             minLines: 1,
           ),
-          const SizedBox(height: 16),
+          SwitchListTile(
+            key: const Key('repeat'),
+            contentPadding: EdgeInsets.zero,
+            secondary: const Icon(Icons.repeat),
+            title: const Text('매주 반복'),
+            subtitle: const Text('새 주가 시작되면 같은 태스크를 그 주에 다시 만들어요'),
+            value: _repeat,
+            onChanged: (v) => setState(() => _repeat = v),
+          ),
+          const SizedBox(height: 8),
           Card(
             key: const Key('quadrantPreview'),
             color: q.color.withValues(alpha: 0.12),

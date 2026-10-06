@@ -320,6 +320,34 @@ void main() {
     await run('backupSaveFile');
     expect(find.byType(SnackBar), findsOneWidget); // still the previous one
   });
+
+  testWidgets('a new task can be set to repeat weekly and shows the repeat icon', (tester) async {
+    await pumpHome(tester);
+    await tester.tap(find.text('목록'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addTask')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('title')), '주간 회고');
+    await tester.tap(find.byKey(const Key('repeat')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('save')));
+    await tester.pumpAndSettle();
+
+    final task = tasks.weekTasks.single;
+    expect(tasks.isRepeating(task), isTrue);
+    expect(find.byKey(Key('repeatIcon_${task.id}')), findsOneWidget);
+
+    // Turning it off again from the editor.
+    await tester.tap(find.text('주간 회고'));
+    await tester.pumpAndSettle();
+    final toggle = tester.widget<SwitchListTile>(find.byKey(const Key('repeat')));
+    expect(toggle.value, isTrue);
+    await tester.tap(find.byKey(const Key('repeat')));
+    await tester.tap(find.byKey(const Key('save')));
+    await tester.pumpAndSettle();
+    expect(tasks.isRepeating(tasks.weekTasks.single), isFalse);
+    expect(find.byKey(Key('repeatIcon_${task.id}')), findsNothing);
+  });
 }
 
 class _FakeFiles implements BackupFiles {
