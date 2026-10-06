@@ -1,21 +1,48 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_ce/hive_ce.dart';
+import '../models/repeat_rule.dart';
 import '../models/task_model.dart';
 
-/// Storage for one user's tasks.
+/// Storage for one user's tasks and repeat rules.
 abstract class TaskRepository {
   Future<List<Task>> loadAll();
   Future<void> put(Task task);
   Future<void> delete(String id);
+
+  Future<List<RepeatRule>> loadRules();
+  Future<void> putRule(RepeatRule rule);
+  Future<void> deleteRule(String id);
 }
 
-/// One Hive box per user (`tasks_<userId>`), tasks stored as maps keyed by id.
+/// Two Hive boxes per user, `tasks_<userId>` and `repeats_<userId>`, with
+/// records stored as maps keyed by id.
 class HiveTaskRepository implements TaskRepository {
   HiveTaskRepository(this.userId);
 
   final String userId;
 
   Future<Box> _open() => Hive.openBox('tasks_$userId');
+  Future<Box> _openRules() => Hive.openBox('repeats_$userId');
+
+  @override
+  Future<List<RepeatRule>> loadRules() async {
+    final box = await _openRules();
+    final rules = <RepeatRule>[];
+    for (final key in box.keys) {
+      try {
+        rules.add(RepeatRule.fromMap(box.get(key) as Map));
+      } catch (e) {
+        debugPrint('Skipping unreadable repeat rule $key in ${box.name}: $e');
+      }
+    }
+    return rules;
+  }
+
+  @override
+  Future<void> putRule(RepeatRule rule) async => (await _openRules()).put(rule.id, rule.toMap());
+
+  @override
+  Future<void> deleteRule(String id) async => (await _openRules()).delete(id);
 
   @override
   Future<List<Task>> loadAll() async {
@@ -50,6 +77,16 @@ class HiveTaskRepository implements TaskRepository {
 /// In-memory repository for tests and for running without a signed-in user.
 class MemoryTaskRepository implements TaskRepository {
   final Map<String, Task> _tasks = {};
+  final Map<String, RepeatRule> _rules = {};
+
+  @override
+  Future<List<RepeatRule>> loadRules() async => _rules.values.toList();
+
+  @override
+  Future<void> putRule(RepeatRule rule) async => _rules[rule.id] = rule;
+
+  @override
+  Future<void> deleteRule(String id) async => _rules.remove(id);
 
   @override
   Future<List<Task>> loadAll() async =>

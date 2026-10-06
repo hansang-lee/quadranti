@@ -19,7 +19,7 @@ class CarryOverBanner extends StatelessWidget {
     final thisWeek = weekStartOf(now ?? DateTime.now());
     if (tasks.selectedWeek != thisWeek) return const SizedBox.shrink();
     final lastWeek = addWeeks(thisWeek, -1);
-    final count = tasks.unfinishedIn(lastWeek).length;
+    final count = tasks.carryOverCandidates(lastWeek, thisWeek).length;
     if (count == 0) return const SizedBox.shrink();
 
     final theme = Theme.of(context);

@@ -31,6 +31,10 @@ class Task {
   final bool done;
   final DateTime createdAt;
 
+  /// Id of the [RepeatRule] this task belongs to, if it was ever made to
+  /// repeat. Whether it still repeats depends on that rule existing.
+  final String? seriesId;
+
   Task({
     required this.id,
     required this.title,
@@ -42,6 +46,7 @@ class Task {
     DateTime? weekStart,
     this.done = false,
     DateTime? createdAt,
+    this.seriesId,
   })  : immediacy = _clampScore(immediacy),
         effectiveness = _clampScore(effectiveness),
         waste = _clampScore(waste),
@@ -79,6 +84,7 @@ class Task {
     double? illusion,
     DateTime? weekStart,
     bool? done,
+    String? seriesId,
   }) =>
       Task(
         id: id,
@@ -91,6 +97,7 @@ class Task {
         weekStart: weekStart ?? this.weekStart,
         done: done ?? this.done,
         createdAt: createdAt,
+        seriesId: seriesId ?? this.seriesId,
       );
 
   Map<String, dynamic> toMap() => {
@@ -104,6 +111,7 @@ class Task {
         'weekStart': formatDateKey(weekStart),
         'done': done,
         'createdAt': createdAt.toIso8601String(),
+        if (seriesId != null) 'seriesId': seriesId,
       };
 
   /// Tolerates missing keys so older stored records still load.
@@ -118,6 +126,7 @@ class Task {
         weekStart: map['weekStart'] is String ? parseDateKey(map['weekStart'] as String) : null,
         done: map['done'] as bool? ?? false,
         createdAt: map['createdAt'] is String ? DateTime.tryParse(map['createdAt'] as String) : null,
+        seriesId: map['seriesId'] as String?,
       );
 
   @override
@@ -132,9 +141,10 @@ class Task {
       other.illusion == illusion &&
       other.weekStart == weekStart &&
       other.done == done &&
-      other.createdAt == createdAt;
+      other.createdAt == createdAt &&
+      other.seriesId == seriesId;
 
   @override
   int get hashCode => Object.hash(id, title, description, immediacy, effectiveness, waste,
-      illusion, weekStart, done, createdAt);
+      illusion, weekStart, done, createdAt, seriesId);
 }
