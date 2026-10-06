@@ -3,17 +3,22 @@ import 'package:provider/provider.dart';
 import '../core/week_format.dart';
 import '../providers/task_provider.dart';
 import '../providers/auth_provider.dart';
+import '../services/prefs.dart';
 import '../widgets/carry_over_banner.dart';
 import '../widgets/week_summary.dart';
 import 'backup_dialogs.dart';
 import 'graph_view.dart';
+import 'guide_screen.dart';
 import 'list_view.dart';
 import 'task_editor_screen.dart';
 
-enum _MenuAction { carryOver, samples, exportBackup, importBackup, signOut }
+enum _MenuAction { guide, carryOver, samples, exportBackup, importBackup, signOut }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.prefs});
+
+  /// When given, the guide opens once per user on first arrival.
+  final Prefs? prefs;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,6 +34,23 @@ class _HomeScreenState extends State<HomeScreen> {
     TaskListView(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _maybeShowGuide();
+  }
+
+  Future<void> _maybeShowGuide() async {
+    final prefs = widget.prefs;
+    final userId = context.read<AuthProvider>().currentUser?.id;
+    if (prefs == null || userId == null || await prefs.guideSeen(userId)) return;
+    await prefs.markGuideSeen(userId);
+    if (!mounted) return;
+    _openGuide();
+  }
+
+  void _openGuide() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GuideScreen()));
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -39,6 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final tasks = context.read<TaskProvider>();
     final messenger = ScaffoldMessenger.of(context);
     switch (action) {
+      case _MenuAction.guide:
+        _openGuide();
       case _MenuAction.carryOver:
         final moved = await tasks.carryOverUnfinished();
         messenger
@@ -98,6 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
           PopupMenuButton<_MenuAction>(
             onSelected: _onMenu,
             itemBuilder: (context) => [
+              const PopupMenuItem(value: _MenuAction.guide, child: Text('사용법')),
               const PopupMenuItem(value: _MenuAction.carryOver, child: Text('미완료를 다음 주로')),
               const PopupMenuItem(value: _MenuAction.samples, child: Text('예시 태스크 추가')),
               const PopupMenuDivider(),

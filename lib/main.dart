@@ -6,6 +6,7 @@ import 'screens/login_screen.dart';
 import 'providers/task_provider.dart';
 import 'providers/auth_provider.dart';
 import 'core/theme.dart';
+import 'services/prefs.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,14 +18,15 @@ void main() async {
   auth.addListener(() => tasks.setUser(auth.currentUser?.id));
   auth.checkAuthState();
 
-  runApp(QuadrantiApp(auth: auth, tasks: tasks));
+  runApp(QuadrantiApp(auth: auth, tasks: tasks, prefs: HivePrefs()));
 }
 
 class QuadrantiApp extends StatelessWidget {
-  const QuadrantiApp({super.key, required this.auth, required this.tasks});
+  const QuadrantiApp({super.key, required this.auth, required this.tasks, required this.prefs});
 
   final AuthProvider auth;
   final TaskProvider tasks;
+  final Prefs prefs;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +45,7 @@ class QuadrantiApp extends StatelessWidget {
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-            return auth.isLoggedIn ? const HomeScreen() : const LoginScreen();
+            return auth.isLoggedIn ? HomeScreen(prefs: prefs) : const LoginScreen();
           },
         ),
       ),

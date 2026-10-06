@@ -8,7 +8,9 @@ part and a misleading part.
 
 Code: `lib/models/task_model.dart` (formula, `Quadrant` enum),
 `lib/core/quadrant_style.dart` (colours, advice text),
-`lib/screens/task_editor_screen.dart` (slider help text).
+`lib/screens/task_editor_screen.dart` (slider help text),
+`lib/screens/guide_screen.dart` (the in-app explanation of this page, so
+change both together).
 
 ## The four properties
 

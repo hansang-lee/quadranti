@@ -7,7 +7,9 @@ import 'package:quadranti/models/task_model.dart';
 import 'package:quadranti/models/user_model.dart';
 import 'package:quadranti/providers/auth_provider.dart';
 import 'package:quadranti/providers/task_provider.dart';
+import 'package:quadranti/screens/guide_screen.dart';
 import 'package:quadranti/screens/home_screen.dart';
+import 'package:quadranti/services/prefs.dart';
 import 'package:quadranti/services/task_repository.dart';
 
 class _FakeAuth extends AuthProvider {
@@ -230,5 +232,42 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('carryOverBanner')), findsNothing);
     expect(tasks.weekTasks, isEmpty);
+  });
+
+  testWidgets('guide opens once on first arrival and from the menu', (tester) async {
+    final prefs = MemoryPrefs();
+    final auth = _FakeAuth();
+    Future<void> pump() async {
+      tasks = TaskProvider(repositoryFor: (_) => MemoryTaskRepository());
+      await tasks.setUser('u');
+      await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider<TaskProvider>.value(value: tasks),
+          ChangeNotifierProvider<AuthProvider>.value(value: auth),
+        ],
+        // A new key forces a fresh HomeScreen, as after signing in again.
+        child: MaterialApp(home: HomeScreen(key: UniqueKey(), prefs: prefs)),
+      ));
+      await tester.pumpAndSettle();
+    }
+
+    tester.view.physicalSize = const Size(400, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await pump();
+    expect(find.byType(GuideScreen), findsOneWidget);
+    await tester.tap(find.byKey(const Key('guideDone')));
+    await tester.pumpAndSettle();
+    expect(find.byType(GuideScreen), findsNothing);
+
+    await pump();
+    expect(find.byType(GuideScreen), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('사용법'));
+    await tester.pumpAndSettle();
+    expect(find.byType(GuideScreen), findsOneWidget);
   });
 }
