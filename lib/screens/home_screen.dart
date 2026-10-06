@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/task_provider.dart';
 import '../providers/auth_provider.dart';
 import 'graph_view.dart';
 import 'list_view.dart';
@@ -24,15 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Load dummy data for visualization
-    Future.microtask(() =>
-      Provider.of<TaskProvider>(context, listen: false).loadDummyData()
-    );
   }
 
   @override

@@ -20,7 +20,7 @@ class QuadrantiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => TaskProvider()),
+        ChangeNotifierProvider(create: (_) => TaskProvider()..loadSampleData()),
         ChangeNotifierProvider(create: (_) => AuthProvider()..checkAuthState()),
       ],
       child: MaterialApp(
