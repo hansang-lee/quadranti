@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../core/week_format.dart';
+import '../providers/task_provider.dart';
 import '../providers/auth_provider.dart';
 import 'graph_view.dart';
 import 'list_view.dart';
+import 'task_editor_screen.dart';
+
+enum _MenuAction { carryOver, samples, signOut }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,9 +19,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  static final List<Widget> _widgetOptions = <Widget>[
-    const GraphView(),
-    const TaskListView(),
+  static const List<Widget> _widgetOptions = <Widget>[
+    GraphView(),
+    TaskListView(),
   ];
 
   void _onItemTapped(int index) {
@@ -25,44 +30,96 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _onMenu(_MenuAction action) async {
+    final tasks = context.read<TaskProvider>();
+    final messenger = ScaffoldMessenger.of(context);
+    switch (action) {
+      case _MenuAction.carryOver:
+        final moved = await tasks.carryOverUnfinished();
+        messenger.showSnackBar(SnackBar(
+          content: Text(moved == 0 ? '옮길 미완료 태스크가 없습니다' : '미완료 $moved개를 다음 주로 옮겼습니다'),
+        ));
+      case _MenuAction.samples:
+        await tasks.loadSampleData();
+      case _MenuAction.signOut:
+        await context.read<AuthProvider>().signOut();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthProvider>(context);
+    final auth = context.watch<AuthProvider>();
+    final tasks = context.watch<TaskProvider>();
+    final week = tasks.selectedWeek;
+    final relative = relativeWeekName(week);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quadranti — ${auth.currentUser?.displayName ?? ''}'),
+        leading: IconButton(
+          key: const Key('prevWeek'),
+          icon: const Icon(Icons.chevron_left),
+          tooltip: '이전 주',
+          onPressed: () => tasks.shiftWeek(-1),
+        ),
+        titleSpacing: 0,
+        title: InkWell(
+          // Tapping the title jumps back to this week.
+          onTap: () => tasks.selectWeek(DateTime.now()),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(formatWeekRange(week), key: const Key('weekTitle')),
+              Text(
+                relative ?? auth.currentUser?.displayName ?? '',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white70),
+              ),
+            ],
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: '로그아웃',
-            onPressed: () => auth.signOut(),
+            key: const Key('nextWeek'),
+            icon: const Icon(Icons.chevron_right),
+            tooltip: '다음 주',
+            onPressed: () => tasks.shiftWeek(1),
+          ),
+          PopupMenuButton<_MenuAction>(
+            onSelected: _onMenu,
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: _MenuAction.carryOver, child: Text('미완료를 다음 주로')),
+              const PopupMenuItem(value: _MenuAction.samples, child: Text('예시 태스크 추가')),
+              PopupMenuItem(
+                value: _MenuAction.signOut,
+                child: Text('로그아웃 (${auth.currentUser?.displayName ?? ''})'),
+              ),
+            ],
           ),
         ],
       ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: tasks.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.grid_view),
-            label: 'Graph',
+            label: '그래프',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
-            label: 'List',
+            label: '목록',
           ),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Implement Task Add Screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Add Task functionality coming soon'))
-          );
-        },
+        key: const Key('addTask'),
+        tooltip: '태스크 추가',
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const TaskEditorScreen()),
+        ),
         child: const Icon(Icons.add),
       ),
     );
