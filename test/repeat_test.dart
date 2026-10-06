@@ -99,10 +99,37 @@ void main() {
     expect(reopened.tasks.where((t) => t.weekStart == week1), isEmpty);
   });
 
-  test('a task made to repeat in a past week starts from the current week', () async {
+  test('a task made to repeat in a past week starts with the next week, not now', () async {
     final lastWeek = addWeeks(week0, -1);
     await repeating('old', week: lastWeek);
-    expect(provider.tasks.where((t) => t.weekStart == week0).map((t) => t.seriesId), ['old']);
+    expect(provider.rules.single.lastWeek, week0);
+    expect(provider.tasks.where((t) => t.weekStart == week0), isEmpty);
+    now = DateTime(2026, 10, 13);
+    await provider.createDueRepeats();
+    expect(provider.tasks.where((t) => t.weekStart == week1).map((t) => t.seriesId), ['old']);
+  });
+
+  test('ticking or editing an older instance leaves the template alone', () async {
+    final first = await repeating('gym');
+    now = DateTime(2026, 10, 13);
+    await provider.createDueRepeats();
+    final newest = provider.tasks.firstWhere((t) => t.weekStart == week1);
+    await provider.updateTask(newest.copyWith(title: 'New'));
+    await provider.toggleDone(first.id);
+    await provider.updateTask(provider.byId(first.id)!.copyWith(title: 'Old again'));
+    expect(provider.rules.single.title, 'New');
+  });
+
+  test('stop, carry over, re-enable never makes two tasks with one id', () async {
+    final first = await repeating('x');
+    now = DateTime(2026, 10, 13);
+    await provider.createDueRepeats(); // x-2026-10-12 in week1
+    await provider.carryOverUnfinished(from: week1, to: addWeeks(week1, 1)); // moved to week2
+    await provider.setRepeat(first, false);
+    await provider.setRepeat(provider.byId(first.id)!, true);
+    await provider.createDueRepeats();
+    final ids = provider.tasks.map((t) => t.id).toList();
+    expect(ids.toSet().length, ids.length);
   });
 
   test('carry-over leaves a repeating task behind when its series is already there', () async {

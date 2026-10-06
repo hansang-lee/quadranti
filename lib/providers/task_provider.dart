@@ -110,7 +110,8 @@ class TaskProvider with ChangeNotifier {
 
     final created = <Task>[];
     for (final rule in due) {
-      final exists = _tasks.any((t) => t.seriesId == rule.id && t.weekStart == week);
+      final id = RepeatRule.instanceId(rule.id, week);
+      final exists = _tasks.any((t) => t.id == id || (t.seriesId == rule.id && t.weekStart == week));
       if (!exists) created.add(rule.instanceFor(week, createdAt: _clock()));
     }
     final updatedRules = [for (final r in due) r.withLastWeek(week)];
@@ -126,8 +127,10 @@ class TaskProvider with ChangeNotifier {
   }
 
   /// Starts or stops repeating [task] weekly. Starting gives it a series
-  /// (its own id) and a rule whose template is the task; stopping deletes
-  /// the rule, and existing instances stay.
+  /// (its own id) and a rule whose template is the task; the first new
+  /// instance comes with the next calendar week (never the current one, and
+  /// never a week the series already reached). Stopping deletes the rule,
+  /// and existing instances stay.
   Future<void> setRepeat(Task task, bool repeat) async {
     final repository = _repository;
     if (byId(task.id) == null || repository == null) return;
@@ -141,13 +144,18 @@ class TaskProvider with ChangeNotifier {
     }
     if (isRepeating(task)) return;
     final inSeries = task.seriesId == null ? task.copyWith(seriesId: task.id) : task;
-    final rule = RepeatRule.fromTask(inSeries);
+    var start = task.weekStart;
+    final thisWeek = weekStartOf(_clock());
+    if (thisWeek.isAfter(start)) start = thisWeek;
+    for (final t in _tasks) {
+      if (t.seriesId == inSeries.seriesId && t.weekStart.isAfter(start)) start = t.weekStart;
+    }
+    final rule = RepeatRule.fromTask(inSeries, lastWeek: start);
     _tasks = List.unmodifiable(_tasks.map((t) => t.id == task.id ? inSeries : t));
     _rules = {..._rules, rule.id: rule};
     notifyListeners();
     await repository.put(inSeries);
     await repository.putRule(rule);
-    await createDueRepeats();
   }
 
   void shiftWeek(int weeks) => selectWeek(addWeeks(_selectedWeek, weeks));
@@ -173,7 +181,10 @@ class TaskProvider with ChangeNotifier {
     if (byId(task.id) == null) return;
     final repository = _repository;
     _tasks = List.unmodifiable(_tasks.map((t) => t.id == task.id ? task : t));
-    final rule = isRepeating(task) ? _rules[task.seriesId]!.withTemplate(task) : null;
+    // Only the series' newest instance sets the template; ticking or
+    // editing an older week must not roll later weeks back.
+    final current = isRepeating(task) ? _rules[task.seriesId]! : null;
+    final rule = current != null && !task.weekStart.isBefore(current.lastWeek) ? current.withTemplate(task) : null;
     if (rule != null) _rules = {..._rules, rule.id: rule};
     notifyListeners();
     await repository?.put(task);
