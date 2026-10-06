@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:quadranti/core/week.dart';
 import 'package:quadranti/models/task_model.dart';
 import 'package:quadranti/models/user_model.dart';
 import 'package:quadranti/providers/auth_provider.dart';
@@ -198,5 +199,36 @@ void main() {
     await tester.pumpAndSettle();
     expect(tasks.tasks, hasLength(4));
     expect(find.text('가져오기 완료: 새 태스크 4개, 덮어쓴 태스크 0개'), findsOneWidget);
+  });
+
+  testWidgets('banner brings last week\'s unfinished tasks into this week', (tester) async {
+    await pumpHome(tester);
+    final lastWeek = addWeeks(tasks.selectedWeek, -1);
+    await tasks.addTask(Task(id: 'open', title: '미룬 일', weekStart: lastWeek));
+    await tasks.addTask(Task(id: 'done', title: '끝낸 일', weekStart: lastWeek, done: true));
+    await tester.pumpAndSettle();
+    expect(find.text('지난 주에 끝내지 못한 태스크가 1개 있어요'), findsOneWidget);
+
+    // Not shown on other weeks.
+    await tester.tap(find.byKey(const Key('prevWeek')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('carryOverBanner')), findsNothing);
+    await tester.tap(find.byKey(const Key('nextWeek')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('carryOverAccept')));
+    await tester.pumpAndSettle();
+    expect(tasks.weekTasks.map((t) => t.id), ['open']);
+    expect(find.byKey(const Key('carryOverBanner')), findsNothing);
+  });
+
+  testWidgets('banner can be closed', (tester) async {
+    await pumpHome(tester);
+    await tasks.addTask(Task(id: 'open', title: '미룬 일', weekStart: addWeeks(tasks.selectedWeek, -1)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('닫기'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('carryOverBanner')), findsNothing);
+    expect(tasks.weekTasks, isEmpty);
   });
 }

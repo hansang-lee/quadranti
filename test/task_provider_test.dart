@@ -89,6 +89,15 @@ void main() {
     expect(provider.byId('a')!.done, isTrue);
   });
 
+  test('carryOverUnfinished from an explicit week', () async {
+    final last = DateTime(2026, 9, 28);
+    await provider.addTask(task('old', week: last));
+    expect(provider.unfinishedIn(last), hasLength(1));
+    expect(await provider.carryOverUnfinished(from: last, to: provider.selectedWeek), 1);
+    expect(provider.weekTasks.map((t) => t.id), ['old']);
+    expect(provider.unfinishedIn(last), isEmpty);
+  });
+
   test('carryOverUnfinished moves only open tasks to next week', () async {
     await provider.addTask(task('open'));
     await provider.addTask(task('done', done: true));

@@ -63,7 +63,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 - [x] 3.10 Tasks with the same scores share one dot: titles stacked beside it ("외 n개" past three), and a tap asks which task to open. `fa9263b`
 - [ ] 3.3 Onboarding: one screen that explains the four properties and the quadrants, shown on first sign-in and reachable from the menu.
 - [x] 3.4 Week summary bar above the graph and list: count per quadrant and 완료 n/m. It wraps on narrow screens.
-- [ ] 3.5 At the start of a new week, offer to carry over last week's unfinished tasks, instead of relying only on the menu.
+- [x] 3.5 While viewing this week, a banner offers to bring over last week's unfinished tasks (이번 주로 / 닫기). Closing it hides it until the app restarts.
 - [ ] 3.6 Drag a point on the graph to re-rate a task, so the four scores scale to match. Needs a rule for splitting a point move between the two properties of each axis. Do this after D1.
 - [ ] 3.7 Optional day of the week (월–일) for a task, with a filter in the list. This extends D2, so record the decision first.
 - [ ] 3.8 Dark mode. Quadrant colours and the painter's black/white values become theme-aware.

@@ -106,13 +106,19 @@ class TaskProvider with ChangeNotifier {
     if (task != null) await updateTask(task.copyWith(done: !task.done));
   }
 
-  /// Moves every unfinished task of [selectedWeek] into the next week.
-  /// Returns how many were moved.
-  Future<int> carryOverUnfinished() async {
-    final next = addWeeks(_selectedWeek, 1);
-    final moving = weekTasks.where((t) => !t.done).toList();
+  /// Unfinished tasks scheduled in the week starting [weekStart].
+  List<Task> unfinishedIn(DateTime weekStart) =>
+      _tasks.where((t) => !t.done && t.weekStart == weekStart).toList();
+
+  /// Moves every unfinished task of the week [from] (default: [selectedWeek])
+  /// into the week [to] (default: the week after [from]). Returns how many
+  /// were moved.
+  Future<int> carryOverUnfinished({DateTime? from, DateTime? to}) async {
+    final source = from ?? _selectedWeek;
+    final target = to ?? addWeeks(source, 1);
+    final moving = unfinishedIn(source);
     for (final t in moving) {
-      await updateTask(t.copyWith(weekStart: next));
+      await updateTask(t.copyWith(weekStart: target));
     }
     return moving.length;
   }

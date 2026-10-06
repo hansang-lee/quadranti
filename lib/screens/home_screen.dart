@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/week_format.dart';
 import '../providers/task_provider.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/carry_over_banner.dart';
 import '../widgets/week_summary.dart';
 import 'backup_dialogs.dart';
 import 'graph_view.dart';
@@ -20,6 +21,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  // Closing the carry-over banner hides it until the app restarts.
+  bool _carryOverDismissed = false;
 
   static const List<Widget> _widgetOptions = <Widget>[
     GraphView(),
@@ -113,6 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
+                if (!_carryOverDismissed)
+                  CarryOverBanner(onDismiss: () => setState(() => _carryOverDismissed = true)),
                 if (tasks.weekTasks.isNotEmpty) WeekSummary(tasks: tasks.weekTasks),
                 Expanded(child: _widgetOptions.elementAt(_selectedIndex)),
               ],
