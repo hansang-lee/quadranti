@@ -67,7 +67,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 - [ ] 3.6 Drag a point on the graph to re-rate a task, so the four scores scale to match. Needs a rule for splitting a point move between the two properties of each axis. Do this after D1.
 - [ ] 3.7 Optional day of the week (월–일) for a task, with a filter in the list. This extends D2, so record the decision first.
 - [x] 3.8 Dark mode follows the system (`AppTheme.darkTheme`). `QuadrantPainter` takes `ink`/`surface` from the theme instead of fixed black and white. The login screen stays indigo in both.
-- [ ] 3.9 Accessibility: semantics labels for graph points, since the canvas is invisible to screen readers. The list view is the accessible path.
+- [x] 3.9 Each graph dot has a semantics node (titles, quadrant, x/y; `QuadrantPainter.semanticsBuilder`). Activating a task stays with the list view.
 
 ## Phase 4: Data safety and accounts
 

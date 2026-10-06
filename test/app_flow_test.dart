@@ -38,6 +38,7 @@ void main() {
   }
 
   testWidgets('empty week offers samples, which then show on the graph', (tester) async {
+    final semantics = tester.ensureSemantics();
     await pumpHome(tester);
     expect(find.text('이 주에 등록된 태스크가 없습니다'), findsOneWidget);
 
@@ -45,6 +46,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(tasks.weekTasks, hasLength(4));
     expect(find.byKey(const Key('graph')), findsOneWidget);
+    // Each dot is visible to screen readers.
+    expect(find.semantics.byLabel(RegExp(r'^무한 스크롤\. 제거 사분면')), findsOne);
+    semantics.dispose();
   });
 
   testWidgets('add a task through the editor and see it in the list', (tester) async {

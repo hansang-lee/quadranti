@@ -64,4 +64,10 @@ void main() {
       expect(QuadrantPainter.tasksAt(tasks, size, const Offset(199, 1)).map((t) => t.id), ['tr', 'tw']);
     });
   });
+
+  test('semantic label names tasks, quadrant and position', () {
+    final a = Task(id: 'a', title: '보고서', immediacy: 7, effectiveness: 9, waste: 1, illusion: 2);
+    final b = Task(id: 'b', title: '메일', immediacy: 7, effectiveness: 9, waste: 1, illusion: 2, done: true);
+    expect(QuadrantPainter.semanticLabel([a, b]), '보고서, 메일 (완료). 집중 사분면, 가치 +8, 실제 긴급도 +5');
+  });
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import '../models/task_model.dart';
 import '../core/constants.dart';
 import '../core/quadrant_style.dart';
@@ -169,6 +170,30 @@ class QuadrantPainter extends CustomPainter {
     );
     textPainter.paint(canvas, at - offset);
   }
+
+  /// Screen-reader text for the tasks at one point.
+  static String semanticLabel(List<Task> group) {
+    final q = group.first.quadrant;
+    final titles = group.map((t) => t.done ? '${t.title} (완료)' : t.title).join(', ');
+    return '$titles. ${q.label} 사분면, 가치 ${_signed(group.first.x)}, 실제 긴급도 ${_signed(group.first.y)}';
+  }
+
+  static String _signed(double v) => v > 0 ? '+${v.toStringAsFixed(0)}' : v.toStringAsFixed(0);
+
+  /// One semantics node per dot, so screen readers can find tasks on the
+  /// canvas. Activating them is left to the list view.
+  @override
+  SemanticsBuilderCallback get semanticsBuilder => (Size size) => [
+        for (final group in groupByPosition(tasks))
+          CustomPainterSemantics(
+            key: ValueKey(group.first.id),
+            rect: Rect.fromCircle(center: positionOf(group.first, size), radius: 20),
+            properties: SemanticsProperties(label: semanticLabel(group), textDirection: TextDirection.ltr),
+          ),
+      ];
+
+  @override
+  bool shouldRebuildSemantics(covariant QuadrantPainter oldDelegate) => oldDelegate.tasks != tasks;
 
   @override
   bool shouldRepaint(covariant QuadrantPainter oldDelegate) {
