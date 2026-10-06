@@ -4,7 +4,9 @@ import '../services/auth_service.dart';
 import '../services/local_auth_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  final AuthService _authService = LocalAuthService();
+  AuthProvider({AuthService? service}) : _authService = service ?? LocalAuthService();
+
+  final AuthService _authService;
 
   User? _currentUser;
   bool _isLoading = true;
@@ -18,10 +20,17 @@ class AuthProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _currentUser = await _authService.getCurrentUser();
-
-    _isLoading = false;
-    notifyListeners();
+    try {
+      _currentUser = await _authService.getCurrentUser();
+    } catch (e) {
+      // A damaged session must not leave the app on the spinner forever;
+      // fall back to the login screen.
+      debugPrint('Restoring the session failed: $e');
+      _currentUser = null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   /// Sign up with email and password

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive_ce.dart';
+import 'package:quadranti/providers/auth_provider.dart';
 import 'package:quadranti/services/local_auth_service.dart';
 
 void main() {
@@ -54,6 +55,21 @@ void main() {
     });
 
     expect(await auth.signIn(email: 'Old@Example.com', password: 'pw'), isNotNull);
+  });
+
+  test('sign up cannot shadow a legacy mixed-case account', () async {
+    final users = await Hive.openBox('users');
+    await users.put('Old@Example.com', {'id': '1', 'email': 'Old@Example.com', 'displayName': 'Old', 'passwordHash': 'x'});
+    expect(await auth.signUp(email: 'old@example.com', password: 'pw'), isNull);
+  });
+
+  test('a damaged session falls back to signed out instead of hanging', () async {
+    final box = await Hive.openBox('auth');
+    await box.put('current_user', {'id': 1});
+    final provider = AuthProvider(service: auth);
+    await provider.checkAuthState();
+    expect(provider.isLoading, isFalse);
+    expect(provider.isLoggedIn, isFalse);
   });
 
   test('session survives until sign out', () async {

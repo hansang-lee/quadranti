@@ -31,8 +31,10 @@ class LocalAuthService implements AuthService {
     email = _normalizeEmail(email);
     final usersBox = await _openUsersBox();
 
-    // Check if email already registered
-    if (usersBox.containsKey(email)) {
+    // Check if email already registered, including legacy accounts whose
+    // key kept the email's original case.
+    if (usersBox.containsKey(email) ||
+        usersBox.keys.any((k) => k.toString().toLowerCase() == email)) {
       return null; // Already exists
     }
 
