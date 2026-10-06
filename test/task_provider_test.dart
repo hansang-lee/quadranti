@@ -75,6 +75,14 @@ void main() {
     expect(provider.weekTasks.map((t) => t.id), ['next']);
   });
 
+  test('weekTasks keeps its identity until something changes', () async {
+    await provider.addTask(task('a'));
+    final first = provider.weekTasks;
+    expect(identical(provider.weekTasks, first), isTrue);
+    await provider.toggleDone('a');
+    expect(identical(provider.weekTasks, first), isFalse);
+  });
+
   test('toggleDone flips done', () async {
     await provider.addTask(task('a'));
     await provider.toggleDone('a');

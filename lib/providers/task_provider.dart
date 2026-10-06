@@ -30,8 +30,20 @@ class TaskProvider with ChangeNotifier {
   String? get userId => _userId;
   DateTime get selectedWeek => _selectedWeek;
 
-  /// Tasks scheduled in [selectedWeek].
-  List<Task> get weekTasks => List.unmodifiable(_tasks.where((t) => t.weekStart == _selectedWeek));
+  /// Tasks scheduled in [selectedWeek]. Cached, so the same list instance
+  /// is returned until the tasks or the week change.
+  List<Task> get weekTasks {
+    if (!identical(_weekTasksSource, _tasks) || _weekTasksWeek != _selectedWeek) {
+      _weekTasksSource = _tasks;
+      _weekTasksWeek = _selectedWeek;
+      _weekTasks = List.unmodifiable(_tasks.where((t) => t.weekStart == _selectedWeek));
+    }
+    return _weekTasks;
+  }
+
+  List<Task>? _weekTasksSource;
+  DateTime? _weekTasksWeek;
+  List<Task> _weekTasks = const [];
 
   /// Switches to [userId]'s tasks (or none when null) and loads them.
   Future<void> setUser(String? userId) async {
