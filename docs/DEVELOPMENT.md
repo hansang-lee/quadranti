@@ -26,6 +26,7 @@ Android (D3, D4).
 flutter analyze             # must be clean (CI fails on any issue)
 flutter test                # unit + widget tests, ~3 s
 flutter build web --release # CI also builds this
+flutter build apk --debug   # local Android SDK at ~/Android/Sdk; ~1 min (not in CI)
 ```
 
 CI (`.github/workflows/ci.yml`) runs all three on every push to `master`.
@@ -56,6 +57,9 @@ Conventions:
   Storage uses `yyyy-MM-dd`.
 - The stored task format is `Task.toMap`. `fromMap` must keep reading older
   records, so a new field needs a default.
+- `TaskProvider` batch operations (import, carry-over, samples) update
+  memory once and then write through `_putAll`, which captures the
+  repository first. A user switch mid-write must not redirect the writes.
 - Widget tests use a tall phone-sized view (`tester.view.physicalSize`).
   The editor is a lazy `ListView`, so widgets below the fold are not built in
   the default 800x600 test view.

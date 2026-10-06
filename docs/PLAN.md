@@ -9,7 +9,8 @@ Read `CONCEPT.md` (the model) and `DECISIONS.md` (D1, D2, …) first. To run
 and check the app, see `DEVELOPMENT.md`.
 
 Work through the phases in order. Each task is one small commit. Tick the
-box in the same commit, and add the hash for tasks that are done.
+box in the same commit. A commit cannot contain its own hash, so add the
+hash in the next commit that touches this file.
 Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 ---
@@ -17,19 +18,29 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 ## Where the code stands (2026-10-07)
 
 - The local email login works (D4 is open). Each user's tasks are stored in
-  their own Hive box and survive reloads.
-- Week view: the app bar steps through weeks. Tapping the title jumps to this
-  week.
+  their own Hive box and survive reloads. Unreadable records are skipped
+  rather than hiding everything.
+- Week view: the app bar steps through weeks, and tapping the title jumps to
+  this week. A summary line shows the count per quadrant and 완료 n/m. On this
+  week, a banner offers to bring over last week's unfinished tasks.
 - The graph is responsive, with tinted quadrants, a grid, labelled points and
-  faded finished tasks. Tapping a point opens it for editing.
+  faded finished tasks. Tasks rated alike share a dot. Tapping a dot edits the
+  task, or asks which one when several share it. Every dot has a screen-reader
+  label.
 - The list is grouped by quadrant, with done checkboxes, swipe to delete
   (with undo) and tap to edit.
 - The editor has a title, a memo and four 0–10 sliders with help text. A live
   card shows the resulting quadrant and x/y.
-- Menu actions: carry unfinished tasks over to the next week, add the sample
-  tasks, sign out.
-- 42 tests (model, week helpers, provider, Hive repository, local auth,
-  painter, widget flows). CI runs analyze, test and the web build on every push.
+- Menu: 사용법 (the guide, also shown once per user on arrival), carrying
+  unfinished tasks over to the next week, sample tasks, clipboard JSON backup
+  export and import, and sign-out.
+- Dark mode follows the system. IBM Plex Sans KR is bundled. The app icon
+  shows the four quadrant colours.
+- 61 tests (model, week helpers, provider including race cases, the Hive
+  repository, local auth, backup, painter, widget flows). CI runs analyze,
+  test and the web build on every push. The debug APK builds locally.
+- Seen in a real browser at phone size (light and dark) with
+  `tool/web_driver.ts`. Not yet tried on an Android device.
 
 ---
 
@@ -40,14 +51,17 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 - [x] 0.3 Move to `hive_ce`, and drop the unregistered User adapter (D5). `22b3a50`
 - [x] 0.4 Add GitHub Actions CI: analyze, test, build web. `a2bd24e`
 - [x] 0.5 Slim down the Docker dev container (no `--privileged`, verified TLS, Flutter 3.47.5). `09d46d3`
-- [x] 0.6 Docs: README, PLAN, CONCEPT, DECISIONS, DEVELOPMENT, and `tool/web_driver.ts`.
+- [x] 0.6 Docs: README, PLAN, CONCEPT, DECISIONS, DEVELOPMENT, and `tool/web_driver.ts`. `a28f1b1`
 
-## Phase 1: Bugs found in the 2026-10-06 review ✅
+## Phase 1: Bugs ✅
 
 - [x] 1.1 The graph never repainted after a change, because the same list instance was compared by identity. `5aec19c`
 - [x] 1.2 Sample tasks were duplicated on every login, and the samples did not cover all four quadrants. `d819ad3`
 - [x] 1.3 Email case made duplicate accounts, the password was trimmed, and `setState` ran after dispose. `36cc30f`
 - [x] 1.4 Scores were not clamped, so points could be drawn off the canvas. `536cd1b`
+- [x] 1.5 Snackbars queued, so undo after two quick deletes acted on the wrong task. `e2e1fc4`
+- [x] 1.6 Reviewer findings (2026-10-07). A damaged session left the app stuck on the spinner, and a new account could shadow a legacy mixed-case one. `daa4d3a`
+- [x] 1.7 Reviewer findings. Batch writes could land in the next user's box after a switch, one bad record hid every task, and duplicate ids in a backup were kept. `1dd8b88`
 
 ## Phase 2: Core MVP ✅
 
@@ -61,17 +75,17 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 - [ ] 3.1 👤 Settle **D1** (the axis formula), after a week of real use.
 - [x] 3.2 Bundle IBM Plex Sans KR (400 and 700) and drop `google_fonts` (D6). `b139ec2`
 - [x] 3.10 Tasks with the same scores share one dot: titles stacked beside it ("외 n개" past three), and a tap asks which task to open. `fa9263b`
-- [x] 3.3 Guide screen (`GuideScreen`): the four properties, the axes, the quadrants and the week flow. It opens once per user (`Prefs`, Hive box `prefs`) and from 메뉴 → 사용법. Its wording must stay in step with CONCEPT.md, so update it with D1.
-- [x] 3.4 Week summary bar above the graph and list: count per quadrant and 완료 n/m. It wraps on narrow screens.
-- [x] 3.5 While viewing this week, a banner offers to bring over last week's unfinished tasks (이번 주로 / 닫기). Closing it hides it until the app restarts.
+- [x] 3.3 Guide screen (`GuideScreen`): the four properties, the axes, the quadrants and the week flow. It opens once per user (`Prefs`, Hive box `prefs`) and from 메뉴 → 사용법. Its wording must stay in step with CONCEPT.md, so update it with D1. `a5e154f`
+- [x] 3.4 Week summary bar above the graph and list: count per quadrant and 완료 n/m. It wraps on narrow screens. `17f8a79`
+- [x] 3.5 While viewing this week, a banner offers to bring over last week's unfinished tasks (이번 주로 / 닫기). Closing it hides it until the app restarts. `a4beb2d`
 - [ ] 3.6 Drag a point on the graph to re-rate a task, so the four scores scale to match. Needs a rule for splitting a point move between the two properties of each axis. Do this after D1.
 - [ ] 3.7 Optional day of the week (월–일) for a task, with a filter in the list. This extends D2, so record the decision first.
-- [x] 3.8 Dark mode follows the system (`AppTheme.darkTheme`). `QuadrantPainter` takes `ink`/`surface` from the theme instead of fixed black and white. The login screen stays indigo in both.
-- [x] 3.9 Each graph dot has a semantics node (titles, quadrant, x/y; `QuadrantPainter.semanticsBuilder`). Activating a task stays with the list view.
+- [x] 3.8 Dark mode follows the system (`AppTheme.darkTheme`). `QuadrantPainter` takes `ink`/`surface` from the theme instead of fixed black and white. The login screen stays indigo in both. `94fcbb5`
+- [x] 3.9 Each graph dot has a semantics node (titles, quadrant, x/y; `QuadrantPainter.semanticsBuilder`). Activating a task stays with the list view. `13c0978`
 
 ## Phase 4: Data safety and accounts
 
-- [x] 4.1 JSON backup through the clipboard: the menu has 백업 내보내기 and 백업 가져오기. Import merges by id and never deletes. Format: `TaskBackup` (`lib/services/task_backup.dart`), version 1.
+- [x] 4.1 JSON backup through the clipboard: the menu has 백업 내보내기 and 백업 가져오기. Import merges by id and never deletes. Format: `TaskBackup` (`lib/services/task_backup.dart`), version 1. `6eb13e0`
 - [ ] 4.1b Back up to a file instead of the clipboard: a download on web, the share sheet on Android. Needs `share_plus` or `package:web`.
 - [ ] 4.2 Repeating tasks (weekly), created when a week is first opened.
 - [ ] 4.3 👤 Settle **D4** (keep or drop the local login).
@@ -81,7 +95,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 ## Phase 5: Release
 
-- [x] 5.1 App icon: the four quadrant colours on indigo (`assets/icon/`, generated with `dart run flutter_launcher_icons`), including the Android adaptive icon and the web/PWA icons. The debug APK builds. A splash screen is still the default.
+- [x] 5.1 App icon: the four quadrant colours on indigo (`assets/icon/`, generated with `dart run flutter_launcher_icons`), including the Android adaptive icon and the web/PWA icons. The debug APK builds. A splash screen is still the default. `4e4c9f4`
 - [ ] 5.2 👤 Host the web build, e.g. on GitHub Pages from CI. The repo is public, so the build would be public too.
 - [ ] 5.3 👤 Android release signing (keystore kept out of git) and a Play Console listing.
 - [ ] 5.4 Privacy note: what is stored, and where.
