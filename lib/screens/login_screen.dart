@@ -104,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     '업무의 본질을 꿰뚫는 스케줄러',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 48),
@@ -170,12 +170,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     onPressed: () => setState(() => _isSignUp = !_isSignUp),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.white.withOpacity(0.5),
-                      overlayColor: Colors.white.withOpacity(0.05),
+                      foregroundColor: Colors.white.withValues(alpha: 0.5),
+                      overlayColor: Colors.white.withValues(alpha: 0.05),
                     ),
                     child: Text(
                       _isSignUp ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 회원가입',
-                      style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -183,12 +183,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Divider
                   Row(
                     children: [
-                      Expanded(child: Divider(color: Colors.white.withOpacity(0.3))),
+                      Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text('OR', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
+                        child: Text('OR', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12)),
                       ),
-                      Expanded(child: Divider(color: Colors.white.withOpacity(0.3))),
+                      Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.3))),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -206,9 +206,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       icon: SvgPicture.asset('assets/images/google-48x48.svg', width: 20, height: 20),
                       label: const Text('Google로 로그인', style: TextStyle(fontSize: 14)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withOpacity(0.2),
+                        backgroundColor: Colors.white.withValues(alpha: 0.2),
                         foregroundColor: Colors.white,
-                        overlayColor: Colors.white.withOpacity(0.1),
+                        overlayColor: Colors.white.withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -233,9 +233,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       icon: Image.asset('assets/images/kakaotalk-48x48.png', width: 20, height: 20),
                       label: const Text('카카오로 로그인', style: TextStyle(fontSize: 14)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withOpacity(0.2),
+                        backgroundColor: Colors.white.withValues(alpha: 0.2),
                         foregroundColor: Colors.white,
-                        overlayColor: Colors.white.withOpacity(0.1),
+                        overlayColor: Colors.white.withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -259,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
               'v${AppConstants.appVersion}',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -278,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
@@ -288,8 +288,8 @@ class _LoginScreenState extends State<LoginScreen> {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-          prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.7)),
+          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+          prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.7)),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),

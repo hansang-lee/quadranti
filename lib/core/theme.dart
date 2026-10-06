@@ -19,8 +19,8 @@ class AppTheme {
     useMaterial3: true,
   );
 
-  static const Color Q1Color = Colors.green;  // High Value, High Urgency
-  static const Color Q2Color = Colors.orange; // Low Value, High Urgency
-  static const Color Q3Color = Colors.grey;   // Low Value, Low Urgency
-  static const Color Q4Color = Colors.blue;   // High Value, Low Urgency
+  static const Color q1Color = Colors.green;  // High Value, High Urgency
+  static const Color q2Color = Colors.orange; // Low Value, High Urgency
+  static const Color q3Color = Colors.grey;   // Low Value, Low Urgency
+  static const Color q4Color = Colors.blue;   // High Value, Low Urgency
 }

@@ -49,10 +49,10 @@ class QuadrantPainter extends CustomPainter {
   
   Color _getColorForQuadrant(int q) {
     switch (q) {
-      case 1: return AppTheme.Q1Color;
-      case 2: return AppTheme.Q2Color;
-      case 3: return AppTheme.Q3Color;
-      case 4: return AppTheme.Q4Color;
+      case 1: return AppTheme.q1Color;
+      case 2: return AppTheme.q2Color;
+      case 3: return AppTheme.q3Color;
+      case 4: return AppTheme.q4Color;
       default: return Colors.black;
     }
   }
