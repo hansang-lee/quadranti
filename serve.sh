@@ -1,48 +1,16 @@
 #!/bin/bash
+# Serve the app on http://localhost:8000 (Flutter web dev server).
+# Uses the local Flutter when installed, otherwise the dev container.
 set -e
 
-if command -v git &>/dev/null && git rev-parse --show-toplevel &>/dev/null; then
-    BASE_DIR="$(git rev-parse --show-toplevel)"
-elif BASE_DIR="$(find "$(realpath "${PWD}")" \
-    -maxdepth 10 \
-    -type f \
-    -name .root \
-    -exec dirname {} \; | head -n1)" && [ -n "${BASE_DIR}" ]; then :
+BASE_DIR="$(cd "$(dirname "$(realpath "$0")")" && pwd)"
+PORT="${PORT:-8000}"
+CMD=(flutter run -d web-server --web-port="${PORT}" --web-hostname=0.0.0.0)
+
+if command -v flutter &>/dev/null; then
+    cd "${BASE_DIR}"
+    flutter pub get
+    exec "${CMD[@]}"
 else
-    BASE_DIR="$(dirname "$(realpath "$0")")"
+    exec "${BASE_DIR}/docker.sh" bash -c "flutter pub get && ${CMD[*]}"
 fi
-
-DOCKER_IMAGE="quadranti"
-
-docker build -t ${DOCKER_IMAGE} ${BASE_DIR}
-
-DOCKER_ARGS=(
-    "--rm"
-    "--interactive"
-    "--tty"
-    "--name=quadranti-server"
-    "--user=admin"
-    "--network=host"
-    "--ipc=host"
-    "--privileged=true"
-    "--security-opt=seccomp=unconfined"
-    "--cap-add=SYS_PTRACE"
-    "--env=DISPLAY=${DISPLAY}"
-    "--env=NVIDIA_VISIBLE_DEVICES=all"
-    "--env=NVIDIA_DRIVER_CAPABILITIES=all"
-    "--env=TZ=Asia/Seoul"
-    "--mount=source=/etc/localtime,target=/etc/localtime,type=bind,consistency=cached:ro"
-    "--mount=source=/etc/timezone,target=/etc/timezone,type=bind,consistency=cached:ro"
-    "--mount=source=/dev,target=/dev,type=bind,consistency=cached:ro"
-    "--mount=source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
-    "--mount=source=${BASE_DIR},target=/workspaces/quadranti,type=bind"
-    "--workdir=/workspaces/quadranti"
-    "${DOCKER_IMAGE}"
-)
-
-CONTAINER_COMMANDS="
-    ulimit -c 0;
-    flutter pub get && flutter run -d web-server --web-port=8000
-"
-
-docker run "${DOCKER_ARGS[@]}" /bin/bash -c "${CONTAINER_COMMANDS}"
