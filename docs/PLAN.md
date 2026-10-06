@@ -81,7 +81,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 ## Phase 5: Release
 
-- [ ] 5.1 App icon and splash (the web manifest and Android icons are Flutter defaults).
+- [x] 5.1 App icon: the four quadrant colours on indigo (`assets/icon/`, generated with `dart run flutter_launcher_icons`), including the Android adaptive icon and the web/PWA icons. The debug APK builds. A splash screen is still the default.
 - [ ] 5.2 👤 Host the web build, e.g. on GitHub Pages from CI. The repo is public, so the build would be public too.
 - [ ] 5.3 👤 Android release signing (keystore kept out of git) and a Play Console listing.
 - [ ] 5.4 Privacy note: what is stored, and where.
