@@ -17,6 +17,10 @@ class LocalAuthService implements AuthService {
     return await Hive.openBox(_usersBoxName);
   }
 
+  /// Emails are case-insensitive in practice, so they are stored and looked
+  /// up lowercased.
+  String _normalizeEmail(String email) => email.trim().toLowerCase();
+
   /// Simple hash for password (NOT production-safe, just for local testing)
   String _hashPassword(String password) {
     return sha256.convert(utf8.encode(password)).toString();
@@ -24,6 +28,7 @@ class LocalAuthService implements AuthService {
 
   @override
   Future<User?> signUp({required String email, required String password, String? displayName}) async {
+    email = _normalizeEmail(email);
     final usersBox = await _openUsersBox();
 
     // Check if email already registered
@@ -62,8 +67,9 @@ class LocalAuthService implements AuthService {
   Future<User?> signIn({required String email, required String password}) async {
     final usersBox = await _openUsersBox();
 
-    // Check if user exists
-    final data = usersBox.get(email);
+    // Check if user exists. Accounts created before emails were normalized
+    // are keyed by the email exactly as typed, so fall back to that.
+    final data = usersBox.get(_normalizeEmail(email)) ?? usersBox.get(email);
     if (data == null) {
       throw Exception('EMAIL_NOT_FOUND');
     }

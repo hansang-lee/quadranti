@@ -28,7 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleSubmit() async {
     final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
+    // Not trimmed: spaces are legal password characters.
+    final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
       _showError('이메일과 비밀번호를 입력해주세요');
@@ -51,9 +52,11 @@ class _LoginScreenState extends State<LoginScreen> {
       error = await auth.signIn(email: email, password: password);
     }
 
+    // A successful sign-in swaps this screen out for HomeScreen.
+    if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    if (error != null && mounted) {
+    if (error != null) {
       _showError(error);
     }
   }
