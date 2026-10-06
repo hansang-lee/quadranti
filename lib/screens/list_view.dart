@@ -15,9 +15,9 @@ class TaskListView extends StatelessWidget {
             final task = taskProvider.tasks[index];
             return ListTile(
               title: Text(task.title),
-              subtitle: Text("Q${task.quadrant} | Eff: ${task.effectiveness} Imm: ${task.immediacy}"),
+              subtitle: Text("Q${task.quadrant.number} | Eff: ${task.effectiveness} Imm: ${task.immediacy}"),
               leading: CircleAvatar(
-                child: Text("${task.quadrant}"),
+                child: Text("${task.quadrant.number}"),
               ),
             );
           },

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quadranti/models/task_model.dart';
 import 'package:quadranti/providers/task_provider.dart';
 
 void main() {
@@ -11,7 +12,7 @@ void main() {
 
   test('sample data covers all four quadrants', () {
     final provider = TaskProvider()..loadSampleData();
-    expect(provider.tasks.map((t) => t.quadrant).toSet(), {1, 2, 3, 4});
+    expect(provider.tasks.map((t) => t.quadrant).toSet(), Quadrant.values.toSet());
   });
 
   test('removeTask drops only the matching id', () {

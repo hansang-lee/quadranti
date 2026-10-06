@@ -5,9 +5,8 @@ import '../core/theme.dart';
 
 class QuadrantPainter extends CustomPainter {
   final List<Task> tasks;
-  final double maxRange;
 
-  QuadrantPainter({required this.tasks, this.maxRange = AppConstants.defaultMaxRange});
+  QuadrantPainter({required this.tasks});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -47,15 +46,12 @@ class QuadrantPainter extends CustomPainter {
     }
   }
   
-  Color _getColorForQuadrant(int q) {
-    switch (q) {
-      case 1: return AppTheme.q1Color;
-      case 2: return AppTheme.q2Color;
-      case 3: return AppTheme.q3Color;
-      case 4: return AppTheme.q4Color;
-      default: return Colors.black;
-    }
-  }
+  Color _getColorForQuadrant(Quadrant q) => switch (q) {
+        Quadrant.focus => AppTheme.q1Color,
+        Quadrant.caution => AppTheme.q2Color,
+        Quadrant.eliminate => AppTheme.q3Color,
+        Quadrant.plan => AppTheme.q4Color,
+      };
 
   void _drawText(Canvas canvas, String text, Offset offset) {
     final textSpan = TextSpan(
