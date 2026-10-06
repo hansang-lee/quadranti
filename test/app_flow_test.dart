@@ -9,6 +9,7 @@ import 'package:quadranti/providers/auth_provider.dart';
 import 'package:quadranti/providers/task_provider.dart';
 import 'package:quadranti/screens/guide_screen.dart';
 import 'package:quadranti/screens/home_screen.dart';
+import 'package:quadranti/services/backup_files.dart';
 import 'package:quadranti/services/prefs.dart';
 import 'package:quadranti/services/task_repository.dart';
 
@@ -181,7 +182,9 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('백업 내보내기 (클립보드)'));
+    await tester.tap(find.text('백업'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('backupCopy')));
     await tester.pumpAndSettle();
     expect(clipboard, contains('"app": "quadranti"'));
 
@@ -192,7 +195,9 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('백업 가져오기'));
+    await tester.tap(find.text('백업'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('backupPaste')));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byKey(const Key('backupText')), 'nonsense');
@@ -274,4 +279,63 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(GuideScreen), findsOneWidget);
   });
+
+  testWidgets('save to a file and open it again', (tester) async {
+    final files = _FakeFiles();
+    backupFiles = files;
+    addTearDown(() => backupFiles = FilePickerBackupFiles());
+
+    await pumpHome(tester);
+    await tasks.loadSampleData();
+    await tester.pumpAndSettle();
+
+    Future<void> run(String key) async {
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('백업'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(Key(key)));
+      await tester.pumpAndSettle();
+    }
+
+    await run('backupSaveFile');
+    expect(files.savedName, matches(RegExp(r'^quadranti-backup-\d{4}-\d{2}-\d{2}\.json$')));
+    expect(find.text('태스크 4개를 백업 파일로 저장했습니다'), findsOneWidget);
+
+    await tasks.setUser('other');
+    files.toOpen = files.savedText;
+    await run('backupOpenFile');
+    expect(tasks.tasks, hasLength(4));
+    expect(find.text('가져오기 완료: 새 태스크 4개, 덮어쓴 태스크 0개'), findsOneWidget);
+
+    files.toOpen = '{"app": "something else"}';
+    await run('backupOpenFile');
+    expect(find.text('Quadranti 백업이 아닙니다'), findsOneWidget);
+
+    // Cancelling either dialog says nothing.
+    files
+      ..toOpen = null
+      ..cancelSave = true;
+    await run('backupOpenFile');
+    await run('backupSaveFile');
+    expect(find.byType(SnackBar), findsOneWidget); // still the previous one
+  });
+}
+
+class _FakeFiles implements BackupFiles {
+  String? savedName;
+  String? savedText;
+  String? toOpen;
+  bool cancelSave = false;
+
+  @override
+  Future<bool> save(String fileName, String text) async {
+    if (cancelSave) return false;
+    savedName = fileName;
+    savedText = text;
+    return true;
+  }
+
+  @override
+  Future<String?> open() async => toOpen;
 }

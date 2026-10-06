@@ -85,8 +85,8 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 ## Phase 4: Data safety and accounts
 
-- [x] 4.1 JSON backup through the clipboard: the menu has 백업 내보내기 and 백업 가져오기. Import merges by id and never deletes. Format: `TaskBackup` (`lib/services/task_backup.dart`), version 1. `6eb13e0`
-- [ ] 4.1b Back up to a file instead of the clipboard: a download on web, the share sheet on Android. Needs `share_plus` or `package:web`.
+- [x] 4.1 JSON backup through the clipboard (now under 메뉴 → 백업). Import merges by id and never deletes. Format: `TaskBackup` (`lib/services/task_backup.dart`), version 1. `6eb13e0`
+- [x] 4.1b Back up to and restore from a `.json` file (메뉴 → 백업 → 파일로 저장 / 파일에서 불러오기) with `file_picker`: a download on web, the system save and open dialogs on Android. `lib/services/backup_files.dart` is the seam that tests replace. Web download was checked in headless Chrome; Android so far only builds.
 - [ ] 4.2 Repeating tasks (weekly), created when a week is first opened.
 - [ ] 4.3 👤 Settle **D4** (keep or drop the local login).
 - [ ] 4.4 👤 Choose a sync backend (e.g. reuse the cling Go/Postgres setup, Supabase or Firebase). This decides the cost and the accounts needed.

@@ -12,7 +12,7 @@ import 'guide_screen.dart';
 import 'list_view.dart';
 import 'task_editor_screen.dart';
 
-enum _MenuAction { guide, carryOver, samples, exportBackup, importBackup, signOut }
+enum _MenuAction { guide, carryOver, samples, backup, signOut }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.prefs});
@@ -72,10 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ));
       case _MenuAction.samples:
         await tasks.loadSampleData();
-      case _MenuAction.exportBackup:
-        await exportBackup(context);
-      case _MenuAction.importBackup:
-        await importBackup(context);
+      case _MenuAction.backup:
+        await showBackupSheet(context);
       case _MenuAction.signOut:
         await context.read<AuthProvider>().signOut();
     }
@@ -126,8 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const PopupMenuItem(value: _MenuAction.carryOver, child: Text('미완료를 다음 주로')),
               const PopupMenuItem(value: _MenuAction.samples, child: Text('예시 태스크 추가')),
               const PopupMenuDivider(),
-              const PopupMenuItem(value: _MenuAction.exportBackup, child: Text('백업 내보내기 (클립보드)')),
-              const PopupMenuItem(value: _MenuAction.importBackup, child: Text('백업 가져오기')),
+              const PopupMenuItem(value: _MenuAction.backup, child: Text('백업')),
               const PopupMenuDivider(),
               PopupMenuItem(
                 value: _MenuAction.signOut,

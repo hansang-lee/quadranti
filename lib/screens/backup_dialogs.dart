@@ -1,19 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../core/week.dart';
 import '../providers/task_provider.dart';
+import '../services/backup_files.dart';
 import '../services/task_backup.dart';
+
+/// The backup actions in one sheet: file save/open and clipboard copy/paste.
+Future<void> showBackupSheet(BuildContext context) async {
+  final action = await showModalBottomSheet<Future<void> Function(BuildContext)>(
+    context: context,
+    builder: (sheetContext) {
+      ListTile item(Key key, IconData icon, String title, String subtitle, Future<void> Function(BuildContext) run) =>
+          ListTile(
+            key: key,
+            leading: Icon(icon),
+            title: Text(title),
+            subtitle: Text(subtitle),
+            onTap: () => Navigator.pop(sheetContext, run),
+          );
+      return SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            item(const Key('backupSaveFile'), Icons.download, '파일로 저장', '모든 주의 태스크를 JSON 파일로 저장', saveBackupFile),
+            item(const Key('backupOpenFile'), Icons.upload_file, '파일에서 불러오기', '같은 태스크는 덮어쓰고, 다른 태스크는 그대로 둡니다', openBackupFile),
+            item(const Key('backupCopy'), Icons.copy, '클립보드로 복사', '메모 앱 등에 붙여 넣어 보관', exportBackup),
+            item(const Key('backupPaste'), Icons.paste, '붙여 넣어 가져오기', '복사해 둔 백업 내용을 붙여 넣기', importBackup),
+          ],
+        ),
+      );
+    },
+  );
+  if (action != null && context.mounted) await action(context);
+}
+
+/// `quadranti-backup-2026-10-07.json`
+String backupFileName(DateTime now) => 'quadranti-backup-${formatDateKey(now)}.json';
+
+/// Saves every task of the current user (all weeks) as a JSON file.
+Future<void> saveBackupFile(BuildContext context) async {
+  final tasks = context.read<TaskProvider>().tasks;
+  final messenger = ScaffoldMessenger.of(context);
+  bool saved;
+  try {
+    saved = await backupFiles.save(backupFileName(DateTime.now()), TaskBackup.encode(tasks));
+  } catch (e) {
+    _show(messenger, '파일을 저장하지 못했습니다: $e');
+    return;
+  }
+  if (saved) _show(messenger, '태스크 ${tasks.length}개를 백업 파일로 저장했습니다');
+}
+
+/// Reads a backup file and merges it into the current user's tasks.
+Future<void> openBackupFile(BuildContext context) async {
+  final provider = context.read<TaskProvider>();
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    final text = await backupFiles.open();
+    if (text == null) return;
+    final result = await provider.importTasks(TaskBackup.decode(text));
+    _show(messenger, _importedMessage(result));
+  } on FormatException catch (e) {
+    _show(messenger, e.message);
+  } catch (e) {
+    _show(messenger, '파일을 읽지 못했습니다: $e');
+  }
+}
+
+String _importedMessage(({int added, int replaced}) r) =>
+    '가져오기 완료: 새 태스크 ${r.added}개, 덮어쓴 태스크 ${r.replaced}개';
+
+void _show(ScaffoldMessengerState messenger, String text) => messenger
+  ..hideCurrentSnackBar()
+  ..showSnackBar(SnackBar(content: Text(text)));
 
 /// Copies every task of the current user (all weeks) to the clipboard.
 Future<void> exportBackup(BuildContext context) async {
   final tasks = context.read<TaskProvider>().tasks;
   final messenger = ScaffoldMessenger.of(context);
   await Clipboard.setData(ClipboardData(text: TaskBackup.encode(tasks)));
-  messenger
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(
-      content: Text('태스크 ${tasks.length}개를 클립보드에 복사했습니다. 메모 앱 등에 붙여 넣어 보관하세요.'),
-    ));
+  _show(messenger, '태스크 ${tasks.length}개를 클립보드에 복사했습니다. 메모 앱 등에 붙여 넣어 보관하세요.');
 }
 
 /// Asks for pasted backup text and merges it into the current user's tasks.
@@ -24,11 +91,7 @@ Future<void> importBackup(BuildContext context) async {
     builder: (_) => const _ImportDialog(),
   );
   if (result == null) return;
-  messenger
-    ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(
-      content: Text('가져오기 완료: 새 태스크 ${result.added}개, 덮어쓴 태스크 ${result.replaced}개'),
-    ));
+  _show(messenger, _importedMessage(result));
 }
 
 class _ImportDialog extends StatefulWidget {
