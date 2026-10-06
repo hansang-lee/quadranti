@@ -36,7 +36,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
   the clipboard, both ways), and sign-out. Tasks can repeat weekly (D10).
 - Dark mode follows the system. IBM Plex Sans KR is bundled. The app icon
   shows the four quadrant colours.
-- 75 tests (model, week helpers, provider including race cases, the Hive
+- 77 tests (model, week helpers, provider including race cases, the Hive
   repository, local auth, backup, painter, widget flows). CI runs analyze,
   test and the web build on every push. The debug APK builds locally.
 - Seen in a real browser at phone size (light and dark) with
@@ -87,9 +87,16 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 - [x] 4.1 JSON backup through the clipboard (now under 메뉴 → 백업). Import merges by id and never deletes. Format: `TaskBackup` (`lib/services/task_backup.dart`), version 1. `6eb13e0`
 - [x] 4.1b Back up to and restore from a `.json` file (메뉴 → 백업 → 파일로 저장 / 파일에서 불러오기) with `file_picker`: a download on web, the system save and open dialogs on Android. `lib/services/backup_files.dart` is the seam that tests replace. Web download was checked in headless Chrome; Android so far only builds. `a1b7240`
-- [x] 4.2 Weekly repeating tasks (D10): a 매주 반복 switch in the editor and a 매주 mark in the list. Rules are stored per user and included in backups (version 2).
+- [x] 4.2 Weekly repeating tasks (D10): a 매주 반복 switch in the editor and a 매주 mark in the list. Rules are stored per user and included in backups (version 2). `e86cb9d` `106d09a`, with review fixes in `1a72f26`.
 - [ ] 4.3 👤 Settle **D4** (keep or drop the local login).
 - [ ] 4.4 👤 Choose a sync backend (e.g. reuse the cling Go/Postgres setup, Supabase or Firebase). This decides the cost and the accounts needed.
+  Hosting notes (2026-10-07): the Railway Hobby plan the owner already pays
+  for cling ($5/month, which includes $5 of usage, and allows up to 50
+  projects per workspace) can hold a separate `quadranti` project. No second
+  subscription is needed, but usage is billed on top of the shared $5 credit
+  (roughly $10/GB-month of RAM and $20/vCPU-month). Until sync exists the app
+  needs no server, and the web build is static, so GitHub Pages would host it
+  for free (5.2).
 - [ ] 4.5 Google and Kakao sign-in through a real `AuthService` implementation. Needs 4.4 and per-platform OAuth clients (👤).
 - [ ] 4.6 Sync local tasks to the backend and migrate existing local data on first sign-in.
 
