@@ -72,7 +72,9 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
 
   Future<void> _save() async {
     if (_title.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
         const SnackBar(content: Text('제목을 입력해주세요')),
       );
       return;

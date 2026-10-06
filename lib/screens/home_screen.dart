@@ -38,7 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (action) {
       case _MenuAction.carryOver:
         final moved = await tasks.carryOverUnfinished();
-        messenger.showSnackBar(SnackBar(
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(
           content: Text(moved == 0 ? '옮길 미완료 태스크가 없습니다' : '미완료 $moved개를 다음 주로 옮겼습니다'),
         ));
       case _MenuAction.samples:

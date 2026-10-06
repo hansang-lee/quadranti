@@ -62,7 +62,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red.shade400,
@@ -202,7 +204,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 48,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
                           const SnackBar(content: Text('Google 로그인은 추후 연동 예정입니다')),
                         );
                       },
@@ -229,7 +233,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 48,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
                           const SnackBar(content: Text('카카오 로그인은 추후 연동 예정입니다')),
                         );
                       },

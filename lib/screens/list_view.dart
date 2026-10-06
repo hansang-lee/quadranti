@@ -77,7 +77,9 @@ class _TaskTile extends StatelessWidget {
     final tasks = context.read<TaskProvider>();
     final messenger = ScaffoldMessenger.of(context);
     await tasks.removeTask(task.id);
-    messenger.showSnackBar(SnackBar(
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
       content: Text('"${task.title}" 삭제됨'),
       action: SnackBarAction(label: '되돌리기', onPressed: () => tasks.addTask(task)),
     ));

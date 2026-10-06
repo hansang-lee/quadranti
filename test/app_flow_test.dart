@@ -90,6 +90,16 @@ void main() {
     await tester.tap(find.text('되돌리기'));
     await tester.pumpAndSettle();
     expect(tasks.weekTasks, hasLength(4));
+
+    // Two deletes in a row: undo applies to the latest one straight away.
+    await tester.drag(find.text('무한 스크롤'), const Offset(-600, 0));
+    await tester.pumpAndSettle();
+    await tester.drag(find.text('형식적인 회의'), const Offset(-600, 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('되돌리기'));
+    await tester.pumpAndSettle();
+    expect(tasks.weekTasks.map((t) => t.title), isNot(contains('무한 스크롤')));
+    expect(tasks.weekTasks.map((t) => t.title), contains('형식적인 회의'));
   });
 
   testWidgets('checkbox marks a task done and the summary counts it', (tester) async {
