@@ -71,7 +71,8 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 ## Phase 4: Data safety and accounts
 
-- [ ] 4.1 Export and import all tasks as a JSON file (backup and device moves). This is the first guard against losing local data.
+- [x] 4.1 JSON backup through the clipboard: the menu has 백업 내보내기 and 백업 가져오기. Import merges by id and never deletes. Format: `TaskBackup` (`lib/services/task_backup.dart`), version 1.
+- [ ] 4.1b Back up to a file instead of the clipboard: a download on web, the share sheet on Android. Needs `share_plus` or `package:web`.
 - [ ] 4.2 Repeating tasks (weekly), created when a week is first opened.
 - [ ] 4.3 👤 Settle **D4** (keep or drop the local login).
 - [ ] 4.4 👤 Choose a sync backend (e.g. reuse the cling Go/Postgres setup, Supabase or Firebase). This decides the cost and the accounts needed.

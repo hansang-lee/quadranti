@@ -117,6 +117,24 @@ class TaskProvider with ChangeNotifier {
     return moving.length;
   }
 
+  /// Adds [imported] tasks, replacing any existing task with the same id.
+  /// Nothing is deleted. Returns how many were new and how many replaced.
+  Future<({int added, int replaced})> importTasks(List<Task> imported) async {
+    final byId = {for (final t in _tasks) t.id: t};
+    var added = 0;
+    var replaced = 0;
+    for (final t in imported) {
+      byId.containsKey(t.id) ? replaced++ : added++;
+      byId[t.id] = t;
+    }
+    _tasks = List.unmodifiable(byId.values);
+    notifyListeners();
+    for (final t in imported) {
+      await _repository?.put(t);
+    }
+    return (added: added, replaced: replaced);
+  }
+
   /// Adds four example tasks, one per quadrant, to [selectedWeek].
   Future<void> loadSampleData() async {
     final week = _selectedWeek;

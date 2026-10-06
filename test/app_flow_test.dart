@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:quadranti/models/task_model.dart';
@@ -147,5 +148,45 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('완료 0/4'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('export to clipboard, then import into an empty account', (tester) async {
+    String? clipboard;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      if (call.method == 'Clipboard.setData') clipboard = (call.arguments as Map)['text'] as String;
+      return null;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+
+    await pumpHome(tester);
+    await tasks.loadSampleData();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('백업 내보내기 (클립보드)'));
+    await tester.pumpAndSettle();
+    expect(clipboard, contains('"app": "quadranti"'));
+
+    // A different (empty) account imports it.
+    await tasks.setUser('other');
+    await tester.pumpAndSettle();
+    expect(tasks.tasks, isEmpty);
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('백업 가져오기'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('backupText')), 'nonsense');
+    await tester.tap(find.byKey(const Key('importBackup')));
+    await tester.pumpAndSettle();
+    expect(find.text('백업 형식이 아닙니다 (JSON 아님)'), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('backupText')), clipboard!);
+    await tester.tap(find.byKey(const Key('importBackup')));
+    await tester.pumpAndSettle();
+    expect(tasks.tasks, hasLength(4));
+    expect(find.text('가져오기 완료: 새 태스크 4개, 덮어쓴 태스크 0개'), findsOneWidget);
   });
 }
