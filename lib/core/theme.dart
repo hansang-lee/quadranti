@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
+  /// Bundled in assets/fonts (see pubspec.yaml).
+  static const String fontFamily = 'IBMPlexSansKR';
+
   static final ThemeData lightTheme = ThemeData(
     colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
     scaffoldBackgroundColor: Colors.white,
-    textTheme: GoogleFonts.ibmPlexSansKrTextTheme(),
+    fontFamily: fontFamily,
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.indigo,
       foregroundColor: Colors.white,
       elevation: 0,
-      titleTextStyle: GoogleFonts.ibmPlexSansKr(
+      // An explicit style does not inherit ThemeData.fontFamily.
+      titleTextStyle: const TextStyle(
+        fontFamily: fontFamily,
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: Colors.white,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/task_model.dart';
 import '../core/constants.dart';
 import '../core/quadrant_style.dart';
+import '../core/theme.dart';
 
 class QuadrantPainter extends CustomPainter {
   final List<Task> tasks;
@@ -122,7 +123,8 @@ class QuadrantPainter extends CustomPainter {
     double maxWidth = double.infinity,
   }) {
     final textPainter = TextPainter(
-      text: TextSpan(text: text, style: style),
+      // Canvas text sees no DefaultTextStyle, so set the family here.
+      text: TextSpan(text: text, style: style.copyWith(fontFamily: AppTheme.fontFamily)),
       textDirection: TextDirection.ltr,
       maxLines: 1,
       ellipsis: '…',

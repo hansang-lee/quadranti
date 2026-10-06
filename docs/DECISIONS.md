@@ -11,7 +11,7 @@ and never renumber them.
 | D3 | 2026-10-07 | Default | Storage is **local only**: one Hive box per user, `tasks_<userId>`, with tasks stored as plain maps (`Task.toMap`), not generated adapters. There is no sync or backup yet. |
 | D4 | 2026-10-07 | **Open** | Keep or drop the **local email login**. See below. |
 | D5 | 2026-10-07 | Default | `hive_ce` instead of `hive`. It is the maintained fork, with the same API and file format. |
-| D6 | 2026-10-07 | Default | `google_fonts` is pinned to 6.x, because 9.x targets the split-out `material_ui` package and does not type-check on Flutter 3.47. Fonts download at runtime, and plan 2.1 bundles them. |
+| D6 | 2026-10-07 | Default | Fonts are bundled, not fetched: IBM Plex Sans KR Regular and Bold in `assets/fonts` (OFL), declared in `pubspec.yaml`, with `google_fonts` removed. `google_fonts` made one family per weight, so a missing weight failed instead of falling back. Only 400 and 700 ship (about 2.8 MB each); w500 and w600 resolve to the nearest of the two. Canvas text (`QuadrantPainter`) and explicit `TextStyle`s in the theme must set `AppTheme.fontFamily` themselves. |
 | D7 | 2026-10-07 | Default | The app UI is in Korean. Code, comments, docs and commit messages are in English. |
 | D8 | 2026-10-07 | Default | Platforms are **web and Android**. iOS is added when there is a Mac to build on. |
 | D9 | 2026-10-07 | Default | Sample tasks are never seeded on their own. An empty week shows a button that adds them. |

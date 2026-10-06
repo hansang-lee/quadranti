@@ -59,7 +59,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 ## Phase 3: Make it pleasant to use daily
 
 - [ ] 3.1 👤 Settle **D1** (the axis formula), after a week of real use.
-- [ ] 3.2 Bundle the IBM Plex Sans KR font as an asset (D6), so the app works offline and does not flash the fallback font on web.
+- [x] 3.2 Bundle IBM Plex Sans KR (400 and 700) and drop `google_fonts` (D6). `186d217`
 - [ ] 3.3 Onboarding: one screen that explains the four properties and the quadrants, shown on first sign-in and reachable from the menu.
 - [ ] 3.4 Week summary bar: count per quadrant and the done ratio for the selected week, shown above the graph or list.
 - [ ] 3.5 At the start of a new week, offer to carry over last week's unfinished tasks, instead of relying only on the menu.

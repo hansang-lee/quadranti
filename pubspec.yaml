@@ -12,7 +12,6 @@ dependencies:
   provider: ^6.0.0
   crypto: ^3.0.3
   flutter_svg: ^2.0.7
-  google_fonts: ^6.3.0
   hive_ce: ^2.20.1
   hive_ce_flutter: ^2.4.0
 
@@ -25,3 +24,11 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+  # IBM Plex Sans KR (OFL, assets/fonts/OFL.txt). Only 400 and 700 are
+  # bundled (~2.8 MB each); other weights resolve to the nearest one.
+  fonts:
+    - family: IBMPlexSansKR
+      fonts:
+        - asset: assets/fonts/IBMPlexSansKR-Regular.ttf
+        - asset: assets/fonts/IBMPlexSansKR-Bold.ttf
+          weight: 700
