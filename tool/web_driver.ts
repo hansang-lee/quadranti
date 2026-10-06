@@ -4,6 +4,7 @@
 // Usage: SHOTS=<dir> bun tool/web_driver.ts <step> [<step> ...]
 // Steps: goto:<url> | click:<x>,<y> | drag:<x1>,<y1>,<x2>,<y2> | type:<text>
 //        key:<Enter|Tab> | wait:<ms> | shot:<name>   (saves <SHOTS>/<name>.png)
+//        scheme:<light|dark>   (prefers-color-scheme; put it before goto)
 // Expects Chrome listening on localhost:9333 (--remote-debugging-port=9333).
 // The viewport is fixed at 412x860, a typical phone.
 const SHOTS = process.env.SHOTS ?? '.';
@@ -24,6 +25,7 @@ for (const step of process.argv.slice(2)) {
   else if (cmd === 'drag') { const [x1, y1, x2, y2] = arg.split(',').map(Number); await mouse('mousePressed', x1, y1); for (let i = 1; i <= 10; i++) { await mouse('mouseMoved', x1 + (x2 - x1) * i / 10, y1 + (y2 - y1) * i / 10); await sleep(30); } await mouse('mouseReleased', x2, y2); await sleep(700); }
   else if (cmd === 'type') { await send('Input.insertText', { text: arg }); await sleep(300); }
   else if (cmd === 'key') { const code = arg; const vk: any = { Enter: 13, Tab: 9 }; await send('Input.dispatchKeyEvent', { type: 'keyDown', key: code, code, windowsVirtualKeyCode: vk[code] }); await send('Input.dispatchKeyEvent', { type: 'keyUp', key: code, code, windowsVirtualKeyCode: vk[code] }); await sleep(500); }
+  else if (cmd === 'scheme') { await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: arg }] }); }
   else if (cmd === 'wait') { await sleep(Number(arg)); }
   else if (cmd === 'shot') { const r = await send('Page.captureScreenshot', { format: 'png' }); await Bun.write(`${SHOTS}/${arg}.png`, Buffer.from(r.result.data, 'base64')); }
 }

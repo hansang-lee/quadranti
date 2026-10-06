@@ -7,7 +7,13 @@ import '../core/theme.dart';
 class QuadrantPainter extends CustomPainter {
   final List<Task> tasks;
 
-  QuadrantPainter({required this.tasks});
+  /// Colour for axes, grid and text (the theme's onSurface).
+  final Color ink;
+
+  /// Background colour, used to outline the dots.
+  final Color surface;
+
+  QuadrantPainter({required this.tasks, this.ink = Colors.black, this.surface = Colors.white});
 
   /// Where [task] is drawn in a canvas of [size]. Task.normalizedY is 1.0 at
   /// the top, while canvas y grows downwards, hence the flip.
@@ -61,7 +67,7 @@ class QuadrantPainter extends CustomPainter {
 
     // Grid, one line per score step
     final grid = Paint()
-      ..color = Colors.black12
+      ..color = ink.withValues(alpha: 0.12)
       ..strokeWidth = AppConstants.gridStrokeWidth;
     final steps = (AppConstants.scoreMax * 2).toInt();
     for (var i = 1; i < steps; i++) {
@@ -73,7 +79,7 @@ class QuadrantPainter extends CustomPainter {
 
     // Axes
     final axis = Paint()
-      ..color = Colors.black54
+      ..color = ink.withValues(alpha: 0.54)
       ..strokeWidth = AppConstants.axisStrokeWidth;
     canvas.drawLine(Offset(0, center.dy), Offset(size.width, center.dy), axis);
     canvas.drawLine(Offset(center.dx, 0), Offset(center.dx, size.height), axis);
@@ -90,7 +96,7 @@ class QuadrantPainter extends CustomPainter {
     }
 
     // Axis captions
-    const caption = TextStyle(color: Colors.black54, fontSize: 11);
+    final caption = TextStyle(color: ink.withValues(alpha: 0.54), fontSize: 11);
     _drawText(canvas, '가치 →', Offset(size.width - 4, center.dy + 4), style: caption, anchor: Alignment.topRight);
     _drawText(canvas, '실제 긴급도 ↑', Offset(center.dx + 4, 4), style: caption, anchor: Alignment.topLeft);
 
@@ -112,7 +118,7 @@ class QuadrantPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.5
-          ..color = Colors.white.withValues(alpha: alpha),
+          ..color = surface.withValues(alpha: alpha),
       );
 
       final shown = group.length > maxLabelsPerPoint ? group.take(maxLabelsPerPoint - 1).toList() : group;
@@ -130,7 +136,7 @@ class QuadrantPainter extends CustomPainter {
           text,
           position + Offset(right ? AppConstants.pointRadius + 4 : -AppConstants.pointRadius - 4, dy),
           style: TextStyle(
-            color: Colors.black87.withValues(alpha: done ? 0.35 : 1.0),
+            color: ink.withValues(alpha: done ? 0.3 : 0.87),
             fontSize: 11,
             decoration: done ? TextDecoration.lineThrough : null,
           ),
@@ -166,6 +172,6 @@ class QuadrantPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant QuadrantPainter oldDelegate) {
-    return oldDelegate.tasks != tasks;
+    return oldDelegate.tasks != tasks || oldDelegate.ink != ink || oldDelegate.surface != surface;
   }
 }

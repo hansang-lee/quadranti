@@ -4,9 +4,12 @@ class AppTheme {
   /// Bundled in assets/fonts (see pubspec.yaml).
   static const String fontFamily = 'IBMPlexSansKR';
 
-  static final ThemeData lightTheme = ThemeData(
-    colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-    scaffoldBackgroundColor: Colors.white,
+  static final ThemeData lightTheme = _build(Brightness.light);
+  static final ThemeData darkTheme = _build(Brightness.dark);
+
+  static ThemeData _build(Brightness brightness) => ThemeData(
+    colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo, brightness: brightness),
+    scaffoldBackgroundColor: brightness == Brightness.light ? Colors.white : null,
     fontFamily: fontFamily,
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.indigo,

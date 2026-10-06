@@ -39,7 +39,11 @@ class GraphView extends StatelessWidget {
             },
             child: CustomPaint(
               size: size,
-              painter: QuadrantPainter(tasks: tasks),
+              painter: QuadrantPainter(
+                tasks: tasks,
+                ink: Theme.of(context).colorScheme.onSurface,
+                surface: Theme.of(context).colorScheme.surface,
+              ),
             ),
           ),
         );

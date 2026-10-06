@@ -38,6 +38,7 @@ class QuadrantiApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Quadranti',
         theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
         home: Consumer<AuthProvider>(
           builder: (context, auth, _) {
             if (auth.isLoading) {

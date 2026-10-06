@@ -85,5 +85,6 @@ taken from the previous screenshot. Text goes into the focused field with
 - Editor: save is at (383, 28), and the sliders are at y ≈ 360 / 452 / 544 / 636
   (효과, 낭비, 즉시성, 착각), from x = 42 to x = 370.
 
-The Chrome profile directory keeps IndexedDB between runs. Delete it to
+Put `scheme:dark` before `goto:` to see dark mode. The Chrome profile
+directory keeps IndexedDB between runs. Delete it to
 start again from a blank state.
