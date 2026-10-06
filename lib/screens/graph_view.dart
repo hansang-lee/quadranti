@@ -17,7 +17,7 @@ class GraphView extends StatelessWidget {
               width: 300,
               height: 300,
               child: CustomPaint(
-                painter: QuadrantPainter(tasks: taskProvider.tasks),
+                painter: QuadrantPainter(tasks: taskProvider.weekTasks),
               ),
             ),
           ),

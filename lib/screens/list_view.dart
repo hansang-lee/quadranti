@@ -10,9 +10,9 @@ class TaskListView extends StatelessWidget {
     return Consumer<TaskProvider>(
       builder: (context, taskProvider, child) {
         return ListView.builder(
-          itemCount: taskProvider.tasks.length,
+          itemCount: taskProvider.weekTasks.length,
           itemBuilder: (context, index) {
-            final task = taskProvider.tasks[index];
+            final task = taskProvider.weekTasks[index];
             return ListTile(
               title: Text(task.title),
               subtitle: Text("Q${task.quadrant.number} | Eff: ${task.effectiveness} Imm: ${task.immediacy}"),

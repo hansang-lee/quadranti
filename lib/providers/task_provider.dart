@@ -1,33 +1,122 @@
 import 'package:flutter/material.dart';
+import '../core/week.dart';
 import '../models/task_model.dart';
+import '../services/task_repository.dart';
 
+typedef RepositoryFactory = TaskRepository Function(String userId);
+
+/// The signed-in user's tasks and the week being viewed.
+///
+/// Changes are applied in memory first and then written to the repository.
 class TaskProvider with ChangeNotifier {
+  TaskProvider({RepositoryFactory? repositoryFor, DateTime? now})
+      : _repositoryFor = repositoryFor ?? HiveTaskRepository.new,
+        _selectedWeek = weekStartOf(now ?? DateTime.now());
+
+  final RepositoryFactory _repositoryFor;
+  TaskRepository? _repository;
+  String? _userId;
+  int _loadGeneration = 0;
+
   // Replaced (never mutated) on every change, so listeners such as
   // QuadrantPainter.shouldRepaint can detect a change by identity.
   List<Task> _tasks = const [];
+  bool _isLoading = false;
+  DateTime _selectedWeek;
 
+  /// Every task of the current user, across all weeks.
   List<Task> get tasks => _tasks;
+  bool get isLoading => _isLoading;
+  String? get userId => _userId;
+  DateTime get selectedWeek => _selectedWeek;
 
-  void addTask(Task task) {
+  /// Tasks scheduled in [selectedWeek].
+  List<Task> get weekTasks => List.unmodifiable(_tasks.where((t) => t.weekStart == _selectedWeek));
+
+  /// Switches to [userId]'s tasks (or none when null) and loads them.
+  Future<void> setUser(String? userId) async {
+    if (userId == _userId) return;
+    _userId = userId;
+    _repository = userId == null ? null : _repositoryFor(userId);
+    _tasks = const [];
+    final generation = ++_loadGeneration;
+    if (_repository == null) {
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+    _isLoading = true;
+    notifyListeners();
+
+    final loaded = await _repository!.loadAll();
+    // A newer setUser call has taken over; drop this result.
+    if (generation != _loadGeneration) return;
+    _tasks = List.unmodifiable(loaded);
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void selectWeek(DateTime date) {
+    _selectedWeek = weekStartOf(date);
+    notifyListeners();
+  }
+
+  void shiftWeek(int weeks) => selectWeek(addWeeks(_selectedWeek, weeks));
+
+  Task? byId(String id) {
+    for (final t in _tasks) {
+      if (t.id == id) return t;
+    }
+    return null;
+  }
+
+  Future<void> addTask(Task task) async {
     _tasks = List.unmodifiable([..._tasks, task]);
     notifyListeners();
+    await _repository?.put(task);
   }
 
-  void removeTask(String id) {
+  /// Replaces the task with the same id.
+  Future<void> updateTask(Task task) async {
+    _tasks = List.unmodifiable(_tasks.map((t) => t.id == task.id ? task : t));
+    notifyListeners();
+    await _repository?.put(task);
+  }
+
+  Future<void> removeTask(String id) async {
     _tasks = List.unmodifiable(_tasks.where((task) => task.id != id));
     notifyListeners();
+    await _repository?.delete(id);
   }
-  
-  /// Seeds four example tasks, one per quadrant. Does nothing once any task
-  /// exists, so calling it again (e.g. after a re-login) cannot duplicate them.
-  void loadSampleData() {
-    if (_tasks.isNotEmpty) return;
-    _tasks = List.unmodifiable([
-      Task(id: '1', title: 'Critical Project', immediacy: 8, effectiveness: 9),
-      Task(id: '2', title: 'Useless Meeting', immediacy: 9, effectiveness: 2, waste: 8, illusion: 8),
-      Task(id: '3', title: 'Long-term Strategy', immediacy: 2, effectiveness: 9, illusion: 4),
-      Task(id: '4', title: 'Doom Scrolling', immediacy: 5, effectiveness: 0, waste: 9, illusion: 8),
-    ]);
-    notifyListeners();
+
+  Future<void> toggleDone(String id) async {
+    final task = byId(id);
+    if (task != null) await updateTask(task.copyWith(done: !task.done));
+  }
+
+  /// Moves every unfinished task of [selectedWeek] into the next week.
+  /// Returns how many were moved.
+  Future<int> carryOverUnfinished() async {
+    final next = addWeeks(_selectedWeek, 1);
+    final moving = weekTasks.where((t) => !t.done).toList();
+    for (final t in moving) {
+      await updateTask(t.copyWith(weekStart: next));
+    }
+    return moving.length;
+  }
+
+  /// Adds four example tasks, one per quadrant, to [selectedWeek].
+  Future<void> loadSampleData() async {
+    final week = _selectedWeek;
+    final stamp = DateTime.now().microsecondsSinceEpoch;
+    final samples = [
+      Task(id: '$stamp-1', title: '핵심 프로젝트 마감', immediacy: 8, effectiveness: 9, weekStart: week),
+      Task(id: '$stamp-2', title: '형식적인 회의', immediacy: 9, effectiveness: 2, waste: 8, illusion: 8, weekStart: week),
+      Task(id: '$stamp-3', title: '장기 전략 정리', immediacy: 2, effectiveness: 9, illusion: 4, weekStart: week),
+      Task(id: '$stamp-4', title: '무한 스크롤', immediacy: 5, effectiveness: 0, waste: 9, illusion: 8, weekStart: week),
+    ];
+    for (final t in samples) {
+      await addTask(t);
+    }
   }
 }
