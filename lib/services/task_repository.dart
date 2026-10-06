@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_ce/hive_ce.dart';
 import '../models/task_model.dart';
 
@@ -19,7 +20,16 @@ class HiveTaskRepository implements TaskRepository {
   @override
   Future<List<Task>> loadAll() async {
     final box = await _open();
-    final tasks = box.values.map((v) => Task.fromMap(v as Map)).toList();
+    final tasks = <Task>[];
+    for (final key in box.keys) {
+      try {
+        tasks.add(Task.fromMap(box.get(key) as Map));
+      } catch (e) {
+        // One damaged record must not hide all the others. It stays in the
+        // box untouched, so it can still be inspected or repaired.
+        debugPrint('Skipping unreadable task $key in ${box.name}: $e');
+      }
+    }
     tasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return tasks;
   }

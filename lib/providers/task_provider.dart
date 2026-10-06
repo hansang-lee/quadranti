@@ -60,7 +60,14 @@ class TaskProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final loaded = await _repository!.loadAll();
+    List<Task> loaded = const [];
+    try {
+      loaded = await _repository!.loadAll();
+    } catch (e) {
+      // Leave the list empty rather than stuck loading. Writes still go to
+      // the user's box, so nothing stored is overwritten wholesale.
+      debugPrint('Loading tasks for $userId failed: $e');
+    }
     // A newer setUser call has taken over; drop this result.
     if (generation != _loadGeneration) return;
     _tasks = List.unmodifiable(loaded);
@@ -88,8 +95,10 @@ class TaskProvider with ChangeNotifier {
     await _repository?.put(task);
   }
 
-  /// Replaces the task with the same id.
+  /// Replaces the task with the same id. Does nothing when the current user
+  /// has no such task (e.g. an editor left open across a user switch).
   Future<void> updateTask(Task task) async {
+    if (byId(task.id) == null) return;
     _tasks = List.unmodifiable(_tasks.map((t) => t.id == task.id ? task : t));
     notifyListeners();
     await _repository?.put(task);
@@ -116,11 +125,21 @@ class TaskProvider with ChangeNotifier {
   Future<int> carryOverUnfinished({DateTime? from, DateTime? to}) async {
     final source = from ?? _selectedWeek;
     final target = to ?? addWeeks(source, 1);
-    final moving = unfinishedIn(source);
-    for (final t in moving) {
-      await updateTask(t.copyWith(weekStart: target));
+    final moved = {for (final t in unfinishedIn(source)) t.id: t.copyWith(weekStart: target)};
+    _tasks = List.unmodifiable(_tasks.map((t) => moved[t.id] ?? t));
+    notifyListeners();
+    await _putAll(moved.values);
+    return moved.length;
+  }
+
+  /// Writes [tasks] to the repository of the user current at the time of
+  /// the call. Batch operations go through here so that a user switch
+  /// mid-way cannot send the remaining writes to the next user's box.
+  Future<void> _putAll(Iterable<Task> tasks) async {
+    final repository = _repository;
+    for (final t in tasks.toList()) {
+      await repository?.put(t);
     }
-    return moving.length;
   }
 
   /// Adds [imported] tasks, replacing any existing task with the same id.
@@ -135,9 +154,7 @@ class TaskProvider with ChangeNotifier {
     }
     _tasks = List.unmodifiable(byId.values);
     notifyListeners();
-    for (final t in imported) {
-      await _repository?.put(t);
-    }
+    await _putAll(imported);
     return (added: added, replaced: replaced);
   }
 
@@ -151,8 +168,8 @@ class TaskProvider with ChangeNotifier {
       Task(id: '$stamp-3', title: '장기 전략 정리', immediacy: 2, effectiveness: 9, illusion: 4, weekStart: week),
       Task(id: '$stamp-4', title: '무한 스크롤', immediacy: 5, effectiveness: 0, waste: 9, illusion: 8, weekStart: week),
     ];
-    for (final t in samples) {
-      await addTask(t);
-    }
+    _tasks = List.unmodifiable([..._tasks, ...samples]);
+    notifyListeners();
+    await _putAll(samples);
   }
 }

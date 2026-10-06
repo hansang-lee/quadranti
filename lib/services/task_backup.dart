@@ -13,8 +13,9 @@ class TaskBackup {
         'tasks': [for (final t in tasks) t.toMap()],
       });
 
-  /// Parses a backup. Throws [FormatException] with a Korean message that
-  /// can be shown to the user as is.
+  /// Parses a backup. A task id listed twice keeps its last entry. Throws
+  /// [FormatException] with a Korean message that can be shown to the user
+  /// as is.
   static List<Task> decode(String text) {
     final Object? data;
     try {
@@ -29,17 +30,18 @@ class TaskBackup {
     if (v is! int || v > version) {
       throw const FormatException('더 새로운 버전의 앱에서 만든 백업입니다');
     }
-    final tasks = <Task>[];
+    final tasks = <String, Task>{};
     for (final item in data['tasks'] as List) {
       if (item is! Map || item['id'] is! String || (item['id'] as String).isEmpty) {
         throw const FormatException('백업에 잘못된 태스크가 있습니다');
       }
       try {
-        tasks.add(Task.fromMap(item));
+        final task = Task.fromMap(item);
+        tasks[task.id] = task;
       } catch (_) {
         throw const FormatException('백업에 잘못된 태스크가 있습니다');
       }
     }
-    return tasks;
+    return tasks.values.toList();
   }
 }

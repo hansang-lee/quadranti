@@ -161,7 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
-      floatingActionButton: FloatingActionButton(
+      // Hidden while loading: a task added then would vanish when the load
+      // replaces the list.
+      floatingActionButton: tasks.isLoading ? null : FloatingActionButton(
         key: const Key('addTask'),
         tooltip: '태스크 추가',
         onPressed: () => Navigator.of(context).push(

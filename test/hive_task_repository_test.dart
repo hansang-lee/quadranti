@@ -33,4 +33,14 @@ void main() {
     await HiveTaskRepository('a').delete('1');
     expect((await HiveTaskRepository('a').loadAll()).map((t) => t.id), ['2']);
   });
+
+  test('a damaged record is skipped, the rest still load', () async {
+    final repo = HiveTaskRepository('a');
+    await repo.put(Task(id: '1', title: 'good'));
+    final box = await Hive.openBox('tasks_a');
+    await box.put('2', {'id': '2', 'title': 'bad', 'done': 'yes'});
+
+    expect((await repo.loadAll()).map((t) => t.id), ['1']);
+    expect(box.containsKey('2'), isTrue);
+  });
 }

@@ -65,6 +65,34 @@ void main() {
     expect(p.tasks, isEmpty);
   });
 
+  test('a batch write interrupted by a user switch stays in the first user\'s box', () async {
+    final a = _GatedRepository();
+    final b = MemoryTaskRepository();
+    final p = TaskProvider(repositoryFor: (id) => id == 'a' ? a : b, now: now);
+    await p.setUser('a');
+
+    final import = p.importTasks([task('t1'), task('t2')]);
+    await p.setUser('b');
+    a.release();
+    await import;
+
+    expect(await b.loadAll(), isEmpty);
+    expect((await a.loadAll()).map((t) => t.id), ['t1', 't2']);
+  });
+
+  test('updateTask ignores a task the current user does not have', () async {
+    await provider.updateTask(task('ghost'));
+    expect(provider.tasks, isEmpty);
+    expect(await repos['u1']!.loadAll(), isEmpty);
+  });
+
+  test('a failing load leaves an empty, non-loading list', () async {
+    final p = TaskProvider(repositoryFor: (_) => _FailingRepository(), now: now);
+    await p.setUser('x');
+    expect(p.isLoading, isFalse);
+    expect(p.tasks, isEmpty);
+  });
+
   test('weekTasks and week navigation', () async {
     await provider.addTask(task('this'));
     await provider.addTask(task('next', week: DateTime(2026, 10, 12)));
@@ -105,6 +133,23 @@ void main() {
     expect(provider.byId('open')!.weekStart, DateTime(2026, 10, 12));
     expect(provider.byId('done')!.weekStart, DateTime(2026, 10, 5));
   });
+}
+
+/// put() waits until [release] is called.
+class _GatedRepository extends MemoryTaskRepository {
+  final _gate = Completer<void>();
+  void release() => _gate.complete();
+
+  @override
+  Future<void> put(Task task) async {
+    await _gate.future;
+    await super.put(task);
+  }
+}
+
+class _FailingRepository extends MemoryTaskRepository {
+  @override
+  Future<List<Task>> loadAll() async => throw StateError('disk on fire');
 }
 
 class _SlowRepository extends MemoryTaskRepository {

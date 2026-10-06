@@ -12,6 +12,11 @@ void main() {
     expect(TaskBackup.decode(TaskBackup.encode([a, b])), [a, b]);
   });
 
+  test('a duplicated id keeps its last entry', () {
+    final text = TaskBackup.encode([a, a.copyWith(title: 'later')]);
+    expect(TaskBackup.decode(text).map((t) => t.title), ['later']);
+  });
+
   test('rejects bad input with a user-facing message', () {
     void rejects(String text, String message) => expect(
           () => TaskBackup.decode(text),
