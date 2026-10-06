@@ -41,7 +41,7 @@ lib/
   providers/                 AuthProvider, TaskProvider (state for the selected week; writes go through TaskRepository)
   services/                  AuthService + LocalAuthService (Hive), TaskRepository + Hive/Memory implementations
   screens/                   login, home (week bar, menu, FAB), graph_view, list_view, task_editor_screen
-  widgets/                   QuadrantPainter (drawing + taskAt hit test), EmptyWeek
+  widgets/                   QuadrantPainter (drawing, groupByPosition, tasksAt hit test), EmptyWeek
 test/                        one file per unit; app_flow_test.dart drives HomeScreen end to end
 tool/web_driver.ts           headless-Chrome driver for screenshots (below)
 ```

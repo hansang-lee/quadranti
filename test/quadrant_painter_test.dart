@@ -47,11 +47,21 @@ void main() {
       expect(QuadrantPainter.positionOf(centre, size), const Offset(100, 100));
     });
 
-    test('taskAt finds the nearest task within the radius', () {
+    test('tasksAt finds the nearest point within the radius', () {
       final tasks = [topRight, centre];
-      expect(QuadrantPainter.taskAt(tasks, size, const Offset(105, 98))?.id, 'c');
-      expect(QuadrantPainter.taskAt(tasks, size, const Offset(190, 5))?.id, 'tr');
-      expect(QuadrantPainter.taskAt(tasks, size, const Offset(50, 50)), isNull);
+      expect(QuadrantPainter.tasksAt(tasks, size, const Offset(105, 98)).map((t) => t.id), ['c']);
+      expect(QuadrantPainter.tasksAt(tasks, size, const Offset(190, 5)).map((t) => t.id), ['tr']);
+      expect(QuadrantPainter.tasksAt(tasks, size, const Offset(50, 50)), isEmpty);
+    });
+
+    test('tasks with the same scores share a point', () {
+      final twin = Task(id: 'tw', title: 'tw', immediacy: 10, effectiveness: 10);
+      final tasks = [topRight, centre, twin];
+      expect(
+        QuadrantPainter.groupByPosition(tasks).map((g) => g.map((t) => t.id).toList()),
+        [['tr', 'tw'], ['c']],
+      );
+      expect(QuadrantPainter.tasksAt(tasks, size, const Offset(199, 1)).map((t) => t.id), ['tr', 'tw']);
     });
   });
 }

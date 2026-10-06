@@ -14,20 +14,35 @@ class QuadrantPainter extends CustomPainter {
   static Offset positionOf(Task task, Size size) =>
       Offset(task.normalizedX * size.width, (1.0 - task.normalizedY) * size.height);
 
-  /// The task drawn closest to [point], if one is within [radius] pixels.
-  /// Later tasks are drawn on top, so they win ties.
-  static Task? taskAt(List<Task> tasks, Size size, Offset point, {double radius = 20}) {
-    Task? best;
-    var bestDistance = radius;
+  /// Tasks grouped by graph position. Scores are whole numbers, so tasks
+  /// rated alike land on exactly the same point and are drawn as one.
+  /// Groups and their members keep the order of [tasks].
+  static List<List<Task>> groupByPosition(List<Task> tasks) {
+    final groups = <(double, double), List<Task>>{};
     for (final task in tasks) {
-      final d = (positionOf(task, size) - point).distance;
+      groups.putIfAbsent((task.x, task.y), () => []).add(task);
+    }
+    return groups.values.toList();
+  }
+
+  /// The tasks at the point closest to [tap], if one is within [radius]
+  /// pixels; empty otherwise.
+  static List<Task> tasksAt(List<Task> tasks, Size size, Offset tap, {double radius = 20}) {
+    var best = const <Task>[];
+    var bestDistance = radius;
+    for (final group in groupByPosition(tasks)) {
+      final d = (positionOf(group.first, size) - tap).distance;
       if (d <= bestDistance) {
-        best = task;
+        best = group;
         bestDistance = d;
       }
     }
     return best;
   }
+
+  /// At most this many titles are listed next to a shared point; the rest
+  /// are summarised as "외 n개".
+  static const int maxLabelsPerPoint = 3;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -79,14 +94,17 @@ class QuadrantPainter extends CustomPainter {
     _drawText(canvas, '가치 →', Offset(size.width - 4, center.dy + 4), style: caption, anchor: Alignment.topRight);
     _drawText(canvas, '실제 긴급도 ↑', Offset(center.dx + 4, 4), style: caption, anchor: Alignment.topLeft);
 
-    // Tasks: finished ones faded, each labelled with its title
-    for (final task in tasks) {
-      final alpha = task.done ? 0.35 : 1.0;
-      final position = positionOf(task, size);
+    // Tasks: one dot per position (in the colour of its first open task),
+    // titles stacked beside it, finished tasks faded.
+    const lineHeight = 13.0;
+    for (final group in groupByPosition(tasks)) {
+      final position = positionOf(group.first, size);
+      final allDone = group.every((t) => t.done);
+      final alpha = allDone ? 0.35 : 1.0;
       canvas.drawCircle(
         position,
         AppConstants.pointRadius,
-        Paint()..color = task.quadrant.color.withValues(alpha: alpha),
+        Paint()..color = group.first.quadrant.color.withValues(alpha: alpha),
       );
       canvas.drawCircle(
         position,
@@ -96,20 +114,30 @@ class QuadrantPainter extends CustomPainter {
           ..strokeWidth = 1.5
           ..color = Colors.white.withValues(alpha: alpha),
       );
+
+      final shown = group.length > maxLabelsPerPoint ? group.take(maxLabelsPerPoint - 1).toList() : group;
+      final lines = [
+        for (final t in shown) (t.title, t.done),
+        if (shown.length < group.length) ('외 ${group.length - shown.length}개', false),
+      ];
       // Labels go on the side facing the centre so they stay inside the canvas.
       final right = position.dx < center.dx;
-      _drawText(
-        canvas,
-        task.title,
-        position + Offset(right ? AppConstants.pointRadius + 4 : -AppConstants.pointRadius - 4, 0),
-        style: TextStyle(
-          color: Colors.black87.withValues(alpha: alpha),
-          fontSize: 11,
-          decoration: task.done ? TextDecoration.lineThrough : null,
-        ),
-        anchor: right ? Alignment.centerLeft : Alignment.centerRight,
-        maxWidth: size.width * 0.4,
-      );
+      for (var i = 0; i < lines.length; i++) {
+        final (text, done) = lines[i];
+        final dy = (i - (lines.length - 1) / 2) * lineHeight;
+        _drawText(
+          canvas,
+          text,
+          position + Offset(right ? AppConstants.pointRadius + 4 : -AppConstants.pointRadius - 4, dy),
+          style: TextStyle(
+            color: Colors.black87.withValues(alpha: done ? 0.35 : 1.0),
+            fontSize: 11,
+            decoration: done ? TextDecoration.lineThrough : null,
+          ),
+          anchor: right ? Alignment.centerLeft : Alignment.centerRight,
+          maxWidth: size.width * 0.4,
+        );
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:quadranti/models/task_model.dart';
 import 'package:quadranti/models/user_model.dart';
 import 'package:quadranti/providers/auth_provider.dart';
 import 'package:quadranti/providers/task_provider.dart';
@@ -115,5 +116,24 @@ void main() {
     await tester.tap(find.byKey(const Key('prevWeek')));
     await tester.pumpAndSettle();
     expect(find.text('지난 주'), findsOneWidget);
+  });
+
+  testWidgets('tapping a shared point asks which task to open', (tester) async {
+    await pumpHome(tester);
+    await tasks.addTask(Task(id: 'a', title: '하나', weekStart: tasks.selectedWeek));
+    await tasks.addTask(Task(id: 'b', title: '둘', weekStart: tasks.selectedWeek));
+    await tester.pumpAndSettle();
+
+    // Both have the default scores (x = 5, y = 5): three quarters across,
+    // one quarter down the graph.
+    final graph = tester.getRect(find.byKey(const Key('graph')));
+    await tester.tapAt(graph.topLeft + Offset(graph.width * 0.75, graph.height * 0.25));
+    await tester.pumpAndSettle();
+    expect(find.byType(BottomSheet), findsOneWidget);
+
+    await tester.tap(find.descendant(of: find.byType(BottomSheet), matching: find.text('둘')));
+    await tester.pumpAndSettle();
+    expect(find.text('태스크 편집'), findsOneWidget);
+    expect(find.widgetWithText(TextField, '둘'), findsOneWidget);
   });
 }
