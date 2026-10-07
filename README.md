@@ -14,6 +14,7 @@ The task is then placed on a graph:
 | **not urgent** | 제거 (drop it) | 계획 (schedule it) |
 
 Flutter app for web and Android. Data stays on the device (Hive).
+Web version: https://hansang-lee.github.io/quadranti/ (deployed from `master` by CI).
 
 ```bash
 ./serve.sh          # http://localhost:8000

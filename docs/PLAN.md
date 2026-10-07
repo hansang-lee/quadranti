@@ -103,6 +103,6 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 ## Phase 5: Release
 
 - [x] 5.1 App icon: the four quadrant colours on indigo (`assets/icon/`, generated with `dart run flutter_launcher_icons`), including the Android adaptive icon and the web/PWA icons. The debug APK builds. A splash screen is still the default. `4e4c9f4`
-- [ ] 5.2 👤 Host the web build, e.g. on GitHub Pages from CI. The repo is public, so the build would be public too.
+- [x] 5.2 The web build is public at https://hansang-lee.github.io/quadranti/, deployed by the `deploy` job in `ci.yml` after every green push to `master` (built with `--base-href /quadranti/`). Approved by the owner 2026-10-07.
 - [ ] 5.3 👤 Android release signing (keystore kept out of git) and a Play Console listing.
 - [ ] 5.4 Privacy note: what is stored, and where.

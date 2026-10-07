@@ -33,5 +33,27 @@ jobs:
       - name: Run tests
         run: flutter test
 
+      # Built for GitHub Pages, which serves the site under /quadranti/.
       - name: Build web
-        run: flutter build web --release
+        run: flutter build web --release --base-href /quadranti/
+
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/web
+
+  # Publishes https://hansang-lee.github.io/quadranti/ after a green master build.
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
