@@ -348,6 +348,15 @@ void main() {
     expect(tasks.isRepeating(tasks.weekTasks.single), isFalse);
     expect(find.byKey(Key('repeatIcon_${task.id}')), findsNothing);
   });
+
+  testWidgets('an empty week fits a small phone with the keyboard up', (tester) async {
+    await pumpHome(tester);
+    // A 360 dp phone with the keyboard up leaves only a sliver for the body.
+    tester.view.physicalSize = const Size(360, 340);
+    await tester.pumpAndSettle();
+    expect(find.text('이 주에 등록된 태스크가 없습니다'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 class _FakeFiles implements BackupFiles {
