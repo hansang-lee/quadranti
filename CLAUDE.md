@@ -55,6 +55,7 @@ document says what the code now does.
 scripts/web.sh              # web dev server on http://localhost:8000
 scripts/test/check.sh       # analyze + unit/widget tests; push only on "All checks passed."
 scripts/test/scenario.sh    # the scenario tests on the emulator (--web: headless Chrome), ~3 min
+scripts/test/scenario.sh --matrix   # the same on Android 9/13/16 (cling's AVDs), before a release
 scripts/screens.sh <steps>  # screenshots of the real web build (docs/development.md)
 scripts/phone.sh            # release APK onto the phone plugged in over USB
 ```
@@ -91,6 +92,10 @@ covers only web).
   Only weights 400 and 700 are bundled (D6).
 - **`docs/concept.md` and `lib/screens/guide_screen.dart` say the same
   thing** in two languages. Change them together.
+- **Phone models and Android versions are not tested one by one**
+  (`docs/testing.md`, "Devices"). A new screen gets a case in
+  `test/screen_fit_test.dart`, which covers six profiles: sizes, system
+  bars, the keyboard and text size.
 - **Edge to edge.** Android 15+ draws the app under the system navigation
   bar. A `ListView` (or any scroll view) given an explicit `padding` no
   longer adds that inset, so add `MediaQuery.paddingOf(context).bottom` to

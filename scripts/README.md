@@ -21,7 +21,7 @@ English.
 | Script | What it does | Usage |
 |---|---|---|
 | `test/check.sh` | What CI runs before deploying: `flutter analyze` and the unit + widget tests, logs in `out/<run>/app/`. Ends with "All checks passed." or prints the failing log. | `scripts/test/check.sh` · `--build` (also the release web build) |
-| `test/scenario.sh` | The scenario tests (`integration_test/`) through `flutter drive`: on the `cling_e2e` emulator (booted headless if none runs; never a phone), or with `--web` in headless Chrome (chromedriver from `CHROMEDRIVER`, PATH, or fetched once into `~/.cache/quadranti-chromedriver/`). Logs and a screenshot per step in `out/<run>/scenarios/`. CI runs `--web`. | `scripts/test/scenario.sh` · `scripts/test/scenario.sh repeat backup` · `--web` · `--web --show` |
+| `test/scenario.sh` | The scenario tests (`integration_test/`) through `flutter drive`: on the `cling_e2e` emulator (booted headless if none runs; never a phone), or with `--web` in headless Chrome (chromedriver from `CHROMEDRIVER`, PATH, or fetched once into `~/.cache/quadranti-chromedriver/`). Logs and a screenshot per step in `out/<run>/scenarios/`. CI runs `--web`. `--matrix` runs the same on each Android version in `MATRIX_AVDS` (cling's `cling_api28/33/36`), one emulator at a time, into `scenarios/<avd>/`; it stops running emulators first (after checking every matrix AVD exists) and restores `cling_e2e`. | `scripts/test/scenario.sh` · `scripts/test/scenario.sh repeat backup` · `--web` · `--web --show` · `--matrix` |
 
 ## Results (`out/`)
 

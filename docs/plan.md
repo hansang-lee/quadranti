@@ -56,6 +56,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 - [ ] 3.1 👤 Settle **D1** (the axis formula), after a week of real use.
 - [ ] 3.6 Drag a point on the graph to re-rate a task, so the four scores scale to match. Needs a rule for splitting a point move between the two properties of each axis. Do this after D1.
+- [ ] 3.12 Korean text breaks between any two syllables ("다/음 분기"), seen in the screen-fit check at 200 % text. cling wraps between words with `ProseText` / keepAll (word joiners for drawing only); bring the same to task titles, the guide and the dialogs.
 - [ ] 3.7 Optional day of the week (월–일) for a task, with a filter in the list. This extends D2, so record the decision first.
 
 ## Phase 4: Data safety and accounts
@@ -76,3 +77,5 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 - [ ] 5.3 👤 Android release signing (keystore kept out of git) and a Play Console listing.
 - [ ] 5.4 Privacy note: what is stored, and where.
+- [ ] 5.5 Before each release, run `scripts/test/scenario.sh --matrix` (Android 9, 13 and 16) and go through the real-device checklist on a Samsung phone: the file save and open dialogs, the back gesture, the 3-button and gesture navigation bars, the keyboard over the editor and the paste dialog, a 200 % font, and dark mode. Same plan as cling (its 5.41).
+- [ ] 5.6 👤 Read Google Play's pre-launch report: an internal-testing upload runs the app on real devices, Samsung included, and reports crashes, layout and accessibility issues with screenshots. Free, and it needs 5.3 first.

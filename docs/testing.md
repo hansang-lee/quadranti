@@ -8,7 +8,7 @@ when the scenario tests landed. Keep it current when a layer changes.
 
 | Layer | What it checks | Where | Size | Time | Runs in |
 |---|---|---|---|---|---|
-| **Unit and widget tests** | The model, week maths, the provider (including races and user switches), Hive storage, local auth, backups, the painter, and every screen flow with in-memory storage | `test/` | 79 tests in 10 files | about 4 s | `scripts/test/check.sh`; CI on every push |
+| **Unit and widget tests** | The model, week maths, the provider (including races and user switches), Hive storage, local auth, backups, the painter, every screen flow with in-memory storage, and every screen in six device profiles (`screen_fit_test.dart`) | `test/` | 122 tests in 12 files | about 8 s | `scripts/test/check.sh`; CI on every push |
 | **Scenario tests** | The real app on real storage (Hive on Android, IndexedDB on web), real fonts and a real screen size: whole user journeys with a screenshot per step | `integration_test/` | 6 scenarios | about 3 min on the emulator, about 5 min in local Chrome, about 7 min in CI | `scripts/test/scenario.sh` (emulator) or `--web`; CI runs `--web` on every push |
 
 The layers split the work on purpose. Combinations and edge cases (every
@@ -40,6 +40,7 @@ scripts/test/scenario.sh                  # all six on the cling_e2e emulator (b
 scripts/test/scenario.sh repeat backup    # some, by file name
 scripts/test/scenario.sh --web            # all six in headless Chrome (chromedriver fetched once)
 scripts/test/scenario.sh --web --show     # in a visible Chrome window
+scripts/test/scenario.sh --matrix         # all six on Android 9, 13 and 16, one emulator at a time (before a release)
 ```
 
 Results go to `out/<YYMMDD_hhmmss>/` (gitignored, newest 30 kept):
@@ -51,6 +52,7 @@ out/261010_130151/
   scenarios/logs/<name>.log   flutter drive output per scenario
   scenarios/screenshots/      <scenario>_<nn>_<step>.png; <..>_TIMEOUT.png when a wait gave up
   scenarios/chromedriver.log  --web only
+  scenarios/<avd>/            --matrix: the same per AVD (logs/, screenshots/, summary.txt, emulator.log)
 ```
 
 CI keeps `out/` as the `scenarios` artifact on every run, with screenshots
@@ -66,6 +68,53 @@ included. A failed check also keeps its `out/` as the `out` artifact.
 | `week_flow` | Step to next week and back, then let a week pass and accept the carry-over banner | The 이번 주 / 다음 주 labels; the banner moves only the unfinished task |
 | `repeat` | Make a weekly task, cold-start a week later, then turn repeat off and let another week pass | One fresh open copy per week (D10); nothing after stopping |
 | `backup` | Load samples plus a weekly task, copy the backup, sign up a second account and paste it | Tasks and the repeat rule arrive (version 2); copy failure is reported on web |
+
+## Devices
+
+Phone models and Android versions are not tested one by one, and there are
+no per-version tests. The owner asked this for cling and quadranti on
+2026-10-10, and both answer it the same way. Flutter draws every pixel
+itself and ships its own font, so a Galaxy and a Pixel show the same
+widgets. What differs reaches the app as a few numbers, and each of them is
+tested where it is cheapest:
+
+| What differs | Where it is tested |
+|---|---|
+| Screen size, from 320 dp phones to an open fold | `screen_fit_test.dart`, six profiles |
+| System bars over the app: the status bar, a 48 dp button bar or a 24 dp gesture bar (Android 15+ draws edge to edge) | `screen_fit_test.dart` (the main action must clear the bars), `system_insets_test.dart` |
+| The keyboard taking half the screen | `screen_fit_test.dart` (a 360x400 profile), plus every scenario that types |
+| The user's text size (130 %, 200 %) | `screen_fit_test.dart` |
+| Android version behaviour: edge to edge, permissions, file dialogs, storage | `scenario.sh --matrix` on Android 9, 13 and 16, before a release |
+| Samsung's own behaviour and the real hardware | The owner's phone (`scripts/phone.sh`), the release checklist, and Google Play's pre-launch report (PLAN 5.5, 5.6) |
+
+`screen_fit_test.dart` draws every screen (login, empty week, graph and list
+full of long tasks with the carry-over banner, editor, guide, backup sheet
+and paste dialog) with the real bundled font, in each profile. It scrolls
+each list to the end, and requires the screen's main action to be on
+screen, clear of the system bars and tappable. A layout overflow fails the
+test by itself. A new screen gets a test in each profile, which is one
+`testWidgets` in the loop.
+
+**The matrix AVDs** are cling's (`cling_api28`, `cling_api33`,
+`cling_api36`). Like `cling_e2e`, they are shared, because the system images
+take several GB and the apps do not clash. Each is a `small_phone`
+(360x640 dp) on a `google_apis` x86_64 image with 2 GB of RAM. If they are
+missing, create them like this:
+
+```bash
+SDK=~/Android/Sdk
+for api in 28 33 36; do
+  $SDK/cmdline-tools/latest/bin/sdkmanager "system-images;android-$api;google_apis;x86_64"
+  echo no | $SDK/cmdline-tools/latest/bin/avdmanager create avd -n cling_api$api \
+    -k "system-images;android-$api;google_apis;x86_64" -d small_phone
+  echo 'hw.ramSize=2048' >> ~/.android/avd/cling_api$api.avd/config.ini
+done
+```
+
+`--matrix` stops every running emulator first, and it checks that all its
+AVDs exist before stopping anything. Do not start it while another scenario
+run, this project's or cling's, is using an emulator. It boots `cling_e2e`
+again at the end if that was running before.
 
 ## How the scenarios are built
 
@@ -114,6 +163,9 @@ included. A failed check also keeps its `out/` as the `out` artifact.
 - File backup and restore through the system dialogs. These are not
   automatable here, so widget tests cover the app side through the
   `BackupFiles` seam.
+- The matrix has not run yet: it waits for cling's matrix AVDs, which are
+  being created in cling's session (2026-10-10).
+- Korean text wraps between any two syllables (seen at 200 % text). cling
+  solved this with `ProseText`; see PLAN 3.12.
 - Dark mode in a scenario (`scheme:dark` is covered by `scripts/screens.sh`
   only).
-- A 320 dp screen and a large-font setting.
