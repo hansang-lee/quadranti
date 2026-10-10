@@ -75,6 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case _MenuAction.backup:
         await showBackupSheet(context);
       case _MenuAction.signOut:
+        // A message about this user's tasks must not follow onto the next
+        // user's screens (and cover their buttons).
+        messenger.clearSnackBars();
         await context.read<AuthProvider>().signOut();
     }
   }

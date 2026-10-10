@@ -55,7 +55,7 @@ class GuideScreen extends StatelessWidget {
           heading('한 주 단위로 관리해요'),
           const Text('위쪽 화살표로 주를 넘기고, 제목을 누르면 이번 주로 돌아와요. '
               '끝내지 못한 일은 다음 주로 옮길 수 있어요. '
-              '데이터는 이 기기에만 저장되니 가끔 메뉴의 백업 내보내기를 해 두세요.'),
+              '데이터는 이 기기에만 저장되니 가끔 메뉴의 백업에서 파일로 저장해 두세요.'),
           const SizedBox(height: 24),
           FilledButton(
             key: const Key('guideDone'),
