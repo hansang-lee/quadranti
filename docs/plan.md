@@ -78,7 +78,6 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 The layout follows cling and kairos (owner's request, 2026-10-10).
 
-- [ ] 6.2 Add a root `CLAUDE.md`: what this is, a map of the docs, how we work, how to run and check, and what bites.
 - [ ] 6.3 Move the scripts to `scripts/` (with `scripts/README.md`), put run results in a gitignored `out/<YYMMDD_hhmmss>/`, and add `scripts/test/check.sh`.
 - [ ] 6.4 Scenario tests (`integration_test/`) on the `cling_e2e` emulator through `scripts/test/scenario.sh`, with a screenshot per step, and `docs/testing.md`.
 - [ ] 6.5 Run the same scenarios on web (headless Chrome) in CI.
