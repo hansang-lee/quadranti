@@ -82,7 +82,14 @@ Future<void> exportBackup(BuildContext context) async {
   final provider = context.read<TaskProvider>();
   final tasks = provider.tasks;
   final messenger = ScaffoldMessenger.of(context);
-  await Clipboard.setData(ClipboardData(text: TaskBackup.encode(tasks, rules: provider.rules)));
+  try {
+    await Clipboard.setData(ClipboardData(text: TaskBackup.encode(tasks, rules: provider.rules)));
+  } catch (e) {
+    // Browsers may refuse clipboard access (no permission, page not
+    // focused); say so instead of failing silently.
+    _show(messenger, '클립보드에 복사하지 못했습니다. 파일로 저장을 이용하세요.');
+    return;
+  }
   _show(messenger, '태스크 ${tasks.length}개를 클립보드에 복사했습니다. 메모 앱 등에 붙여 넣어 보관하세요.');
 }
 
