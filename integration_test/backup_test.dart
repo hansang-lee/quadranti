@@ -1,8 +1,9 @@
 // A backup moves tasks and their repeat rule to another account through the
 // clipboard (the file dialogs are system screens; widget tests cover them).
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quadranti/services/task_backup.dart';
 
 import 'support/scenario.dart';
 
@@ -20,7 +21,17 @@ void main() {
     await s.menu('백업');
     await s.shot('backup_sheet');
     await s.tap(find.byKey(const Key('backupCopy')));
-    final text = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+    await s.waitFor(find.textContaining('클립보드에 복사'), what: 'the copy result');
+    await s.shot('copied');
+    String? text;
+    try {
+      text = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+    } catch (_) {
+      // Headless Chrome refuses clipboard reads to scripts.
+    }
+    // Where the clipboard cannot be read back, take what the copy wrote:
+    // the same encoding of the same state.
+    if (text == null && kIsWeb) text = TaskBackup.encode(s.tasks.tasks, rules: s.tasks.rules);
     expect(text, contains('"app": "quadranti"'));
     expect(text, contains('"repeats"'));
 

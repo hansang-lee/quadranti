@@ -137,10 +137,24 @@ class Scenario {
     await settle();
   }
 
+  /// Puts [text] in the field [finder]. On the web the browser's own input
+  /// element holds the text too, and `tester.enterText` changes only
+  /// Flutter's side: the element's old value comes back as the field loses
+  /// focus. There the field's controller is set instead, which Flutter
+  /// passes on to the element (the approach cling's scenarios use).
   Future<void> enter(Finder finder, String text) async {
     await waitFor(finder);
     await tester.ensureVisible(finder.first);
-    await tester.enterText(finder.first, text);
+    if (!kIsWeb) {
+      await tester.enterText(finder.first, text);
+    } else {
+      await tester.showKeyboard(finder.first);
+      final editable = tester.state<EditableTextState>(
+          find.descendant(of: finder.first, matching: find.byType(EditableText), matchRoot: true));
+      editable.widget.controller.value =
+          TextEditingValue(text: text, selection: TextSelection.collapsed(offset: text.length));
+      await tester.pump();
+    }
     await settle();
   }
 
