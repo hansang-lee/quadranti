@@ -91,6 +91,12 @@ covers only web).
   Only weights 400 and 700 are bundled (D6).
 - **`docs/concept.md` and `lib/screens/guide_screen.dart` say the same
   thing** in two languages. Change them together.
+- **Edge to edge.** Android 15+ draws the app under the system navigation
+  bar. A `ListView` (or any scroll view) given an explicit `padding` no
+  longer adds that inset, so add `MediaQuery.paddingOf(context).bottom` to
+  its bottom padding, as the guide and the editor do
+  (`test/system_insets_test.dart`). Sheets use `SafeArea`; screens with
+  the bottom tab bar are covered by it.
 - **Snackbars** call `hideCurrentSnackBar()` before `showSnackBar`.
   Otherwise they queue, and undo acts on the wrong task.
 - **Never run `dart format` over `lib/` or `test/`.** The code is at about

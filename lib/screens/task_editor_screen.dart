@@ -142,7 +142,8 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        // Keep the last slider above the system navigation bar (see GuideScreen).
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.paddingOf(context).bottom),
         children: [
           TextField(
             key: const Key('title'),

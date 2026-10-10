@@ -24,7 +24,10 @@ class GuideScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('사용법')),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        // An explicit padding drops the system inset ListView would add, and
+        // Android 15+ draws under the navigation bar: add it back, or the
+        // 시작하기 button ends up under the bar's buttons.
+        padding: EdgeInsets.fromLTRB(20, 8, 20, 32 + MediaQuery.paddingOf(context).bottom),
         children: [
           heading('태스크마다 네 가지를 0–10으로 매겨요'),
           property('효과', '+', '이 일이 목표에 실제로 기여하는 정도'),
