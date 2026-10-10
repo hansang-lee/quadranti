@@ -9,6 +9,7 @@ Agents read [../CLAUDE.md](../CLAUDE.md) first.
 | File | Kind | What it is |
 |---|---|---|
 | [plan.md](plan.md) | status | The current state and the open tasks by phase. Kept current. |
+| [history.md](history.md) | record | Finished tasks, verbatim and by phase. A task id no longer in plan.md is here. |
 | [decisions.md](decisions.md) | decision | The decision table D1, D2, …: every decision, made or open, with its date. |
 | [concept.md](concept.md) | reference | The four properties, the axis formula and the quadrants: the model the app is built on. |
 | [development.md](development.md) | how-to | The toolchain, running the app, the code layout and conventions, and screenshots of the web build. |
@@ -54,8 +55,8 @@ edited to say something else; a new row supersedes it.
 
 - A code change that alters behaviour described in a doc updates that doc in
   the same commit.
-- A task is finished when its plan entry is ticked and the affected doc says
-  what the code now does.
+- A task is finished when its plan entry is ticked and moved to
+  history.md, and the affected doc says what the code now does.
 - Renaming or moving a doc updates every reference in the same commit:
   `git grep` the old name, including code comments, scripts, configs and
   workflows.
