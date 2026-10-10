@@ -56,7 +56,6 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 - [ ] 3.1 👤 Settle **D1** (the axis formula), after a week of real use.
 - [ ] 3.6 Drag a point on the graph to re-rate a task, so the four scores scale to match. Needs a rule for splitting a point move between the two properties of each axis. Do this after D1.
-- [ ] 3.11 On a 360 dp phone the + button covers the lower-right corner of the graph (the 계획 quadrant); seen in the 2026-10-10 scenario screenshots. Leave room for it, or move it while the graph shows.
 - [ ] 3.7 Optional day of the week (월–일) for a task, with a filter in the list. This extends D2, so record the decision first.
 
 ## Phase 4: Data safety and accounts

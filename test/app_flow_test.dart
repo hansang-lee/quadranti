@@ -374,6 +374,21 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('importBackup')));
     expect(find.byKey(const Key('importBackup')).hitTestable(), findsOneWidget);
   });
+
+  // 360x616 is the 360 dp emulator less its status bar, where the + button
+  // covered the graph's lower-right corner (PLAN 3.11).
+  for (final (w, h) in [(360.0, 640.0), (360.0, 616.0), (360.0, 560.0), (412.0, 860.0), (800.0, 600.0)]) {
+    testWidgets('the + button does not cover the graph at ${w.toInt()}x${h.toInt()}', (tester) async {
+      await pumpHome(tester);
+      await tasks.loadSampleData();
+      tester.view.physicalSize = Size(w, h);
+      await tester.pumpAndSettle();
+      final graph = tester.getRect(find.byKey(const Key('graph')));
+      final fab = tester.getRect(find.byKey(const Key('addTask')));
+      expect(graph.overlaps(fab), isFalse, reason: 'graph $graph, + button $fab');
+      expect(graph.width, greaterThan(200));
+    });
+  }
 }
 
 class _FakeFiles implements BackupFiles {

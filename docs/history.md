@@ -40,6 +40,7 @@ This file only grows.
 - [x] 3.8 Dark mode follows the system (`AppTheme.darkTheme`). `QuadrantPainter` takes `ink`/`surface` from the theme instead of fixed black and white. The login screen stays indigo in both. `94fcbb5`
 - [x] 3.9 Each graph dot has a semantics node (titles, quadrant, x/y; `QuadrantPainter.semanticsBuilder`). Activating a task stays with the list view. `13c0978`
 - [x] 3.10 Tasks with the same scores share one dot: titles stacked beside it ("외 n개" past three), and a tap asks which task to open. `fa9263b`
+- [x] 3.11 On a 360 dp phone the + button covers the lower-right corner of the graph (the 계획 quadrant); seen in the 2026-10-10 scenario screenshots. Leave room for it, or move it while the graph shows. Fixed 2026-10-10: the graph sits at the top and keeps 88 dp clear above the bottom edge for the button; a widget test checks five screen sizes.
 
 ## Phase 4: Data safety and accounts
 

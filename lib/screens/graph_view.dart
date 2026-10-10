@@ -20,29 +20,38 @@ class GraphView extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Largest square that fits, with room for the FAB.
+        // Largest square that fits between a 16 dp margin and the + button,
+        // which floats over the bottom of the body (16 dp margin + 56 dp
+        // button + 16 dp gap). Centring the square used to put its lower
+        // corner under the button on a 360 dp phone.
+        const margin = 16.0;
+        const fabReserve = 16.0 + 56.0 + 16.0;
         final side = math.max(
           0.0,
-          math.min(constraints.maxWidth, constraints.maxHeight) - 32,
+          math.min(constraints.maxWidth - 2 * margin, constraints.maxHeight - margin - fabReserve),
         );
         final size = Size(side, side);
-        return Center(
-          child: GestureDetector(
-            key: const Key('graph'),
-            onTapUp: (details) {
-              final hit = QuadrantPainter.tasksAt(tasks, size, details.localPosition);
-              if (hit.length == 1) {
-                openTaskEditor(context, hit.single.id);
-              } else if (hit.length > 1) {
-                _pickTask(context, hit);
-              }
-            },
-            child: CustomPaint(
-              size: size,
-              painter: QuadrantPainter(
-                tasks: tasks,
-                ink: Theme.of(context).colorScheme.onSurface,
-                surface: Theme.of(context).colorScheme.surface,
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: margin),
+            child: GestureDetector(
+              key: const Key('graph'),
+              onTapUp: (details) {
+                final hit = QuadrantPainter.tasksAt(tasks, size, details.localPosition);
+                if (hit.length == 1) {
+                  openTaskEditor(context, hit.single.id);
+                } else if (hit.length > 1) {
+                  _pickTask(context, hit);
+                }
+              },
+              child: CustomPaint(
+                size: size,
+                painter: QuadrantPainter(
+                  tasks: tasks,
+                  ink: Theme.of(context).colorScheme.onSurface,
+                  surface: Theme.of(context).colorScheme.surface,
+                ),
               ),
             ),
           ),
