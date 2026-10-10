@@ -40,8 +40,14 @@ google-chrome --headless=new --remote-debugging-port=9333 --user-data-dir="$PROF
 CHROME_PID=$!
 cleanup() {
   kill "$HTTP_PID" "$CHROME_PID" 2>/dev/null || true
-  wait "$CHROME_PID" 2>/dev/null || true
-  if [ -n "$TEMP_PROFILE" ]; then rm -rf "$TEMP_PROFILE"; fi
+  # Chrome's helper processes outlive the main one for a moment and keep
+  # writing to the profile; wait for them (up to 5 s) before deleting it.
+  for _ in $(seq 25); do
+    pgrep -f -- "--user-data-dir=$PROFILE" > /dev/null || break
+    sleep 0.2
+  done
+  pkill -f -- "--user-data-dir=$PROFILE" 2>/dev/null || true
+  if [ -n "$TEMP_PROFILE" ]; then rm -rf "$TEMP_PROFILE" 2>/dev/null || true; fi
 }
 trap cleanup EXIT
 
