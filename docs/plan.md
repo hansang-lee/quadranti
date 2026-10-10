@@ -10,7 +10,8 @@ and check the app, see `development.md`.
 
 This file holds what is true now and what is still to do. Finished tasks are
 in [history.md](history.md), verbatim and by phase. Phases 0 (hygiene),
-1 (bugs) and 2 (core MVP) are finished and are there whole.
+1 (bugs), 2 (core MVP) and 6 (project structure and scenario tests) are
+finished and are there whole.
 
 Work through the phases in order. Each task is one small commit. When a task
 is done, tick it and move it to history.md in the same commit. A commit
@@ -41,11 +42,13 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
   the clipboard, both ways), and sign-out. Tasks can repeat weekly (D10).
 - Dark mode follows the system. IBM Plex Sans KR is bundled. The app icon
   shows the four quadrant colours.
-- 77 tests (model, week helpers, provider including race cases, the Hive
-  repository, local auth, backup, painter, widget flows). CI runs analyze,
-  test and the web build on every push. The debug APK builds locally.
-- Seen in a real browser at phone size (light and dark) with
-  `scripts/screens.sh`. Not yet tried on an Android device.
+- 79 unit and widget tests, and 6 scenario tests that run on the Android
+  emulator and in Chrome (docs/testing.md). CI runs the checks and the web
+  scenarios on every push and deploys only when both pass. The debug APK
+  builds locally.
+- Seen on the 360 dp emulator (scenario screenshots) and in a browser at
+  phone size, light and dark (`scripts/screens.sh`). The owner has the web
+  build on their phone.
 
 ---
 
@@ -53,6 +56,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 - [ ] 3.1 👤 Settle **D1** (the axis formula), after a week of real use.
 - [ ] 3.6 Drag a point on the graph to re-rate a task, so the four scores scale to match. Needs a rule for splitting a point move between the two properties of each axis. Do this after D1.
+- [ ] 3.11 On a 360 dp phone the + button covers the lower-right corner of the graph (the 계획 quadrant); seen in the 2026-10-10 scenario screenshots. Leave room for it, or move it while the graph shows.
 - [ ] 3.7 Optional day of the week (월–일) for a task, with a filter in the list. This extends D2, so record the decision first.
 
 ## Phase 4: Data safety and accounts
@@ -73,10 +77,3 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 - [ ] 5.3 👤 Android release signing (keystore kept out of git) and a Play Console listing.
 - [ ] 5.4 Privacy note: what is stored, and where.
-
-## Phase 6: Project structure and scenario tests
-
-The layout follows cling and kairos (owner's request, 2026-10-10).
-
-- [ ] 6.4 Scenario tests (`integration_test/`) on the `cling_e2e` emulator through `scripts/test/scenario.sh`, with a screenshot per step, and `docs/testing.md`.
-- [ ] 6.5 Run the same scenarios on web (headless Chrome) in CI.

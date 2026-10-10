@@ -12,6 +12,7 @@ Agents read [../CLAUDE.md](../CLAUDE.md) first.
 | [history.md](history.md) | record | Finished tasks, verbatim and by phase. A task id no longer in plan.md is here. |
 | [decisions.md](decisions.md) | decision | The decision table D1, D2, …: every decision, made or open, with its date. |
 | [concept.md](concept.md) | reference | The four properties, the axis formula and the quadrants: the model the app is built on. |
+| [testing.md](testing.md) | how-to | The test layers (unit/widget, scenario), how to run each, what each scenario covers, the backlog. |
 | [development.md](development.md) | how-to | The toolchain, running the app, the code layout and conventions, and screenshots of the web build. |
 
 ## Conventions

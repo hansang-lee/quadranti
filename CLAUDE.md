@@ -24,6 +24,7 @@ committed.
 | `docs/history.md` | Finished tasks, verbatim and by phase. A task id no longer in the plan is here |
 | `docs/decisions.md` | The decision table (D1, D2, …): every decision made or still open, with its date |
 | `docs/concept.md` | The model: the four properties, the axis formula and the quadrants |
+| `docs/testing.md` | The two test layers (unit/widget, scenario), how to run each, what each scenario covers, the backlog |
 | `docs/development.md` | The toolchain, running the app, the code layout and conventions, and screenshots of the web build |
 | `scripts/README.md` | Every script, its usage, and the `out/` layout |
 
@@ -53,6 +54,7 @@ document says what the code now does.
 ```bash
 scripts/web.sh              # web dev server on http://localhost:8000
 scripts/test/check.sh       # analyze + unit/widget tests; push only on "All checks passed."
+scripts/test/scenario.sh    # the scenario tests on the emulator (--web: headless Chrome), ~3 min
 scripts/screens.sh <steps>  # screenshots of the real web build (docs/development.md)
 flutter build apk --debug   # local Android SDK
 ```
@@ -62,8 +64,10 @@ Every script is in `scripts/` and listed with its usage in
 screenshots and a `summary.txt` in `out/<YYMMDD_hhmmss>/` (gitignored, the
 newest 30 kept), so repeated work goes through the scripts and its results
 land in one place. CI runs `check.sh` and the web build on every push and
-pull request, then deploys from `master`. The repository is public, so
-Actions minutes are free.
+pull request, and the web scenarios too. It deploys from `master` only when
+both pass. The repository is public, so Actions minutes are free. After a
+change to a screen flow, run the scenarios on the emulator as well (CI
+covers only web).
 
 ## Things that bite
 
@@ -95,6 +99,11 @@ Actions minutes are free.
 - **Widget tests** use a tall phone-sized view (`tester.view.physicalSize`),
   because the editor is a lazy `ListView`. A `SemanticsHandle` must be
   disposed inside the test body, not in `addTearDown`.
+- **Scenario tests** (`docs/testing.md`, "Things that bite"): lazy lists
+  need `reveal`, text entry on web goes through the controller, and
+  headless Chrome has no clipboard. A wait that times out leaves a
+  `TIMEOUT` screenshot in `out/<run>/scenarios/screenshots/`; look at it
+  first.
 - **`flutter test | tail -1` can hide failures.** Look for "All tests
   passed!".
 - **Shell.** The shell is zsh, which does not word-split unquoted variables,

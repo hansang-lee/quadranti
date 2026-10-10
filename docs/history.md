@@ -56,4 +56,6 @@ This file only grows.
 
 - [x] 6.1 Docs follow the cling/kairos conventions: lowercase names, `docs/README.md` (index and conventions), and finished tasks moved from plan.md to this file. `bc309c7`
 - [x] 6.2 Add a root `CLAUDE.md`: what this is, a map of the docs, how we work, how to run and check, and what bites. `6128c0a`
-- [x] 6.3 Move the scripts to `scripts/` (with `scripts/README.md`), put run results in a gitignored `out/<YYMMDD_hhmmss>/`, and add `scripts/test/check.sh`. `3b75b9b`, cleanup fix in the next commit.
+- [x] 6.3 Move the scripts to `scripts/` (with `scripts/README.md`), put run results in a gitignored `out/<YYMMDD_hhmmss>/`, and add `scripts/test/check.sh`. `3b75b9b` `ec87201`
+- [x] 6.4 Scenario tests (`integration_test/`) on the `cling_e2e` emulator through `scripts/test/scenario.sh`, with a screenshot per step, and `docs/testing.md`. The first runs found four app bugs, fixed in `de363a0`, `a72b7cc`, `59f613b` and `b3509b6`. `bba07d2`
+- [x] 6.5 The same scenarios on web (`--web`, headless Chrome), run by CI on every push before deploying. `b18ccf8` `88f3f77`

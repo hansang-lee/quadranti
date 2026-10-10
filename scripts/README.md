@@ -1,7 +1,8 @@
 # scripts
 
 Every script for working on Quadranti locally: running the app, the dev
-container, checks and screenshots. Run them from the repository root
+container, checks, scenario tests and screenshots. What each test layer
+covers is in [docs/testing.md](../docs/testing.md). Run them from the repository root
 (`scripts/<name>`); each prints its usage with `--help`. Script output is in
 English.
 
@@ -19,16 +20,18 @@ English.
 | Script | What it does | Usage |
 |---|---|---|
 | `test/check.sh` | What CI runs before deploying: `flutter analyze` and the unit + widget tests, logs in `out/<run>/app/`. Ends with "All checks passed." or prints the failing log. | `scripts/test/check.sh` · `--build` (also the release web build) |
+| `test/scenario.sh` | The scenario tests (`integration_test/`) through `flutter drive`: on the `cling_e2e` emulator (booted headless if none runs; never a phone), or with `--web` in headless Chrome (chromedriver from `CHROMEDRIVER`, PATH, or fetched once into `~/.cache/quadranti-chromedriver/`). Logs and a screenshot per step in `out/<run>/scenarios/`. CI runs `--web`. | `scripts/test/scenario.sh` · `scripts/test/scenario.sh repeat backup` · `--web` · `--web --show` |
 
 ## Results (`out/`)
 
-Every run of `check.sh` or `screens.sh` leaves what it produced in
+Every run of `check.sh`, `scenario.sh` or `screens.sh` leaves what it produced in
 `out/<YYMMDD_hhmmss>/` (the time it started; gitignored):
 
 ```
 out/261010_143015/
   summary.txt   what ran and PASS/FAIL per part, then the result
   app/          check.sh: pub-get.log, analyze.log, test.log (build.log with --build)
+  scenarios/    scenario.sh: logs/<name>.log, screenshots/<name>_<nn>_<step>.png, chromedriver.log (--web)
   screens/      screens.sh: the PNGs, build.log, chrome.log, http.log
 ```
 

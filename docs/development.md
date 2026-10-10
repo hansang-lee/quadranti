@@ -47,7 +47,9 @@ lib/
                              (tasks and repeat rules), TaskBackup (JSON v2), BackupFiles (file_picker seam), Prefs
   screens/                   login, home (week bar, menu, FAB), graph_view, list_view, task_editor_screen
   widgets/                   QuadrantPainter (drawing, groupByPosition, tasksAt hit test), EmptyWeek
-test/                        one file per unit; app_flow_test.dart drives HomeScreen end to end
+test/                        unit + widget tests, one file per unit; app_flow_test.dart drives HomeScreen end to end
+integration_test/            scenario tests (docs/testing.md); support/scenario.dart is their driver
+test_driver/                 flutter drive's host side: saves the scenario screenshots
 scripts/                     web.sh, docker.sh, screens.sh + web_driver.ts, test/check.sh; see scripts/README.md
 out/                         run results (gitignored), one folder per run
 ```
