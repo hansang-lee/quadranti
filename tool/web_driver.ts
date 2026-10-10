@@ -1,5 +1,5 @@
 // Drives a headless Chrome over the DevTools protocol to click through the
-// web build and take screenshots. See docs/DEVELOPMENT.md, "Looking at the UI".
+// web build and take screenshots. See docs/development.md, "Looking at the UI".
 //
 // Usage: SHOTS=<dir> bun tool/web_driver.ts <step> [<step> ...]
 // Steps: goto:<url> | click:<x>,<y> | drag:<x1>,<y1>,<x2>,<y2> | type:<text>

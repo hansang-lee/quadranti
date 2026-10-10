@@ -17,7 +17,7 @@ change both together).
 Each is a whole number from 0 to 10 (`AppConstants.scoreMax`), clamped by the
 `Task` constructor. The UI text is Korean; the meanings below are the working
 definitions the editor shows. They are an interpretation of the original idea
-and still need the owner's confirmation (see D1 in `DECISIONS.md`).
+and still need the owner's confirmation (see D1 in `decisions.md`).
 
 | Property | UI label | Working definition (editor help text) |
 |---|---|---|
@@ -58,5 +58,5 @@ when its waste is larger than its effectiveness. A task rated "low urgency"
 (immediacy 2) with no illusion still lands in the upper half. In practice
 the user has to use the negative property to push a task down or left. The
 sample task 장기 전략 정리 needs illusion 4 to reach 계획 for this reason.
-Options are in D1 of `DECISIONS.md`. Until that is decided, keep the formula
+Options are in D1 of `decisions.md`. Until that is decided, keep the formula
 and the tests as they are.

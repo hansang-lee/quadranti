@@ -21,7 +21,7 @@ and never renumber them.
 
 The formula is now `x = effectiveness - waste` and `y = immediacy - illusion`.
 A task with no waste and no illusion can never leave the 집중 quadrant, however
-low its effectiveness or immediacy (see `CONCEPT.md`, "Known weakness").
+low its effectiveness or immediacy (see `concept.md`, "Known weakness").
 
 - **A. Keep it.** The negative property is how a task moves down or left.
   This is simple, but the user must always rate both sides.
@@ -35,7 +35,7 @@ low its effectiveness or immediacy (see `CONCEPT.md`, "Known weakness").
 
 Recommendation: use the app for a week with **A** and see whether rating
 both sides feels natural. If it does not, choose **B**. Changing the formula
-touches `Task.x`/`y`, `CONCEPT.md`, the sample values in
+touches `Task.x`/`y`, `concept.md`, the sample values in
 `TaskProvider.loadSampleData` and `test/task_model_test.dart`. Stored data does
 not change, because only the four raw scores are stored.
 

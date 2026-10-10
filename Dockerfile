@@ -1,5 +1,5 @@
 # Optional dev container: Flutter + Android SDK. Not needed when Flutter is
-# installed locally (see docs/DEVELOPMENT.md).
+# installed locally (see docs/development.md).
 FROM debian:12-slim
 
 ARG USERNAME="admin"

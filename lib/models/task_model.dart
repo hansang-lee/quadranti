@@ -1,7 +1,7 @@
 import '../core/constants.dart';
 import '../core/week.dart';
 
-/// Where a task lands on the graph. See docs/CONCEPT.md.
+/// Where a task lands on the graph. See docs/concept.md.
 enum Quadrant {
   focus(1, '집중'), // top-right: real value, really urgent
   caution(2, '주의'), // top-left: urgent but little value (busy trap)

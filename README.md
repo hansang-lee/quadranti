@@ -23,7 +23,9 @@ flutter test
 
 ## Docs
 
-- [docs/PLAN.md](docs/PLAN.md): roadmap and status. Start here.
-- [docs/CONCEPT.md](docs/CONCEPT.md): the four properties, the axis formula, the quadrants
-- [docs/DECISIONS.md](docs/DECISIONS.md): decisions D1, D2, … (open ones need the owner)
-- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md): toolchain, run, test, code layout, screenshots
+The index and the conventions for writing docs are in [docs/README.md](docs/README.md).
+
+- [docs/plan.md](docs/plan.md): roadmap and status. Start here.
+- [docs/concept.md](docs/concept.md): the four properties, the axis formula, the quadrants
+- [docs/decisions.md](docs/decisions.md): decisions D1, D2, … (open ones need the owner)
+- [docs/development.md](docs/development.md): toolchain, run, test, code layout, screenshots

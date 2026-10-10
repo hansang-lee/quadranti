@@ -5,8 +5,8 @@
 > **Stack**: Flutter (web + Android), Hive (`hive_ce`) local storage, Provider
 > **Plan written**: 2026-10-07
 
-Read `CONCEPT.md` (the model) and `DECISIONS.md` (D1, D2, …) first. To run
-and check the app, see `DEVELOPMENT.md`.
+Read `concept.md` (the model) and `decisions.md` (D1, D2, …) first. To run
+and check the app, see `development.md`.
 
 Work through the phases in order. Each task is one small commit. Tick the
 box in the same commit. A commit cannot contain its own hash, so add the
@@ -75,7 +75,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 - [ ] 3.1 👤 Settle **D1** (the axis formula), after a week of real use.
 - [x] 3.2 Bundle IBM Plex Sans KR (400 and 700) and drop `google_fonts` (D6). `b139ec2`
 - [x] 3.10 Tasks with the same scores share one dot: titles stacked beside it ("외 n개" past three), and a tap asks which task to open. `fa9263b`
-- [x] 3.3 Guide screen (`GuideScreen`): the four properties, the axes, the quadrants and the week flow. It opens once per user (`Prefs`, Hive box `prefs`) and from 메뉴 → 사용법. Its wording must stay in step with CONCEPT.md, so update it with D1. `a5e154f`
+- [x] 3.3 Guide screen (`GuideScreen`): the four properties, the axes, the quadrants and the week flow. It opens once per user (`Prefs`, Hive box `prefs`) and from 메뉴 → 사용법. Its wording must stay in step with concept.md, so update it with D1. `a5e154f`
 - [x] 3.4 Week summary bar above the graph and list: count per quadrant and 완료 n/m. It wraps on narrow screens. `17f8a79`
 - [x] 3.5 While viewing this week, a banner offers to bring over last week's unfinished tasks (이번 주로 / 닫기). Closing it hides it until the app restarts. `a4beb2d`
 - [ ] 3.6 Drag a point on the graph to re-rate a task, so the four scores scale to match. Needs a rule for splitting a point move between the two properties of each axis. Do this after D1.

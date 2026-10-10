@@ -3,7 +3,7 @@ import '../core/quadrant_style.dart';
 import '../models/task_model.dart';
 
 /// Explains the four properties and the quadrants. Wording follows
-/// docs/CONCEPT.md; keep the two in step.
+/// docs/concept.md; keep the two in step.
 class GuideScreen extends StatelessWidget {
   const GuideScreen({super.key});
 
