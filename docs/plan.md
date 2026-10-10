@@ -45,7 +45,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
   repository, local auth, backup, painter, widget flows). CI runs analyze,
   test and the web build on every push. The debug APK builds locally.
 - Seen in a real browser at phone size (light and dark) with
-  `tool/web_driver.ts`. Not yet tried on an Android device.
+  `scripts/screens.sh`. Not yet tried on an Android device.
 
 ---
 
@@ -78,6 +78,5 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 
 The layout follows cling and kairos (owner's request, 2026-10-10).
 
-- [ ] 6.3 Move the scripts to `scripts/` (with `scripts/README.md`), put run results in a gitignored `out/<YYMMDD_hhmmss>/`, and add `scripts/test/check.sh`.
 - [ ] 6.4 Scenario tests (`integration_test/`) on the `cling_e2e` emulator through `scripts/test/scenario.sh`, with a screenshot per step, and `docs/testing.md`.
 - [ ] 6.5 Run the same scenarios on web (headless Chrome) in CI.

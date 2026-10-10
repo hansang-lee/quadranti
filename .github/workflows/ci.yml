@@ -24,14 +24,15 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install dependencies
-        run: flutter pub get
+      - name: Analyze and test
+        run: scripts/test/check.sh
 
-      - name: Analyze
-        run: flutter analyze
-
-      - name: Run tests
-        run: flutter test
+      - name: Keep the run logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: out
+          path: out/
 
       # Built for GitHub Pages, which serves the site under /quadranti/.
       - name: Build web

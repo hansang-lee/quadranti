@@ -25,6 +25,7 @@ committed.
 | `docs/decisions.md` | The decision table (D1, D2, …): every decision made or still open, with its date |
 | `docs/concept.md` | The model: the four properties, the axis formula and the quadrants |
 | `docs/development.md` | The toolchain, running the app, the code layout and conventions, and screenshots of the web build |
+| `scripts/README.md` | Every script, its usage, and the `out/` layout |
 
 Keep these current as part of the work, not afterwards. A task is finished
 when its plan entry is ticked and moved to `docs/history.md`, and the affected
@@ -50,16 +51,19 @@ document says what the code now does.
 ## Running and checking
 
 ```bash
-./serve.sh                  # web dev server on http://localhost:8000
-flutter analyze             # must say "No issues found!"
-flutter test                # look for "All tests passed!"
-flutter build web --release
+scripts/web.sh              # web dev server on http://localhost:8000
+scripts/test/check.sh       # analyze + unit/widget tests; push only on "All checks passed."
+scripts/screens.sh <steps>  # screenshots of the real web build (docs/development.md)
 flutter build apk --debug   # local Android SDK
 ```
 
-CI runs analyze, the tests and the web build on every push and pull request,
-then deploys from `master`. The repository is public, so Actions minutes are
-free.
+Every script is in `scripts/` and listed with its usage in
+`scripts/README.md`; a new script gets a row there. Runs leave their logs,
+screenshots and a `summary.txt` in `out/<YYMMDD_hhmmss>/` (gitignored, the
+newest 30 kept), so repeated work goes through the scripts and its results
+land in one place. CI runs `check.sh` and the web build on every push and
+pull request, then deploys from `master`. The repository is public, so
+Actions minutes are free.
 
 ## Things that bite
 

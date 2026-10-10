@@ -5,13 +5,13 @@
 - Flutter **3.47.5** stable (Dart 3.13). The version is pinned in
   `.github/workflows/ci.yml` and in the `Dockerfile`, so change both together.
 - The local install is at `/home/hslee/development/flutter`, already on PATH.
-- The Docker dev container is optional: `./docker.sh` gives a shell, and
-  `./docker.sh flutter test` runs one command.
+- The Docker dev container is optional: `scripts/docker.sh` gives a shell, and
+  `scripts/docker.sh flutter test` runs one command.
 
 ## Run
 
 ```bash
-./serve.sh                  # web dev server on http://localhost:8000 (PORT=... to change)
+scripts/web.sh              # web dev server on http://localhost:8000 (PORT=... to change)
 flutter run -d chrome       # with hot reload in a local Chrome
 flutter run -d <device>     # Android (adb devices)
 ```
@@ -23,13 +23,15 @@ Android (D3, D4).
 ## Check
 
 ```bash
-flutter analyze             # must be clean (CI fails on any issue)
-flutter test                # unit + widget tests, ~3 s
-flutter build web --release # CI also builds this
+scripts/test/check.sh       # analyze + unit/widget tests, logs in out/<run>/; "All checks passed."
+scripts/test/check.sh --build   # and the release web build, as CI does
+flutter test test/repeat_test.dart --plain-name 'missed weeks'   # one file or test
 flutter build apk --debug   # local Android SDK at ~/Android/Sdk; ~1 min (not in CI)
 ```
 
-CI (`.github/workflows/ci.yml`) runs all three on every push to `master`.
+CI (`.github/workflows/ci.yml`) runs `check.sh` and the web build on every
+push and pull request, then deploys `master` to GitHub Pages. Every script
+and the `out/` layout are described in `scripts/README.md`.
 
 ## Layout
 
@@ -46,7 +48,8 @@ lib/
   screens/                   login, home (week bar, menu, FAB), graph_view, list_view, task_editor_screen
   widgets/                   QuadrantPainter (drawing, groupByPosition, tasksAt hit test), EmptyWeek
 test/                        one file per unit; app_flow_test.dart drives HomeScreen end to end
-tool/web_driver.ts           headless-Chrome driver for screenshots (below)
+scripts/                     web.sh, docker.sh, screens.sh + web_driver.ts, test/check.sh; see scripts/README.md
+out/                         run results (gitignored), one folder per run
 ```
 
 Conventions:
@@ -68,15 +71,14 @@ Conventions:
 
 ## Looking at the UI (agents)
 
-There is no emulator here. To see real screens, serve the release web build
-and drive a headless Chrome:
+To see real screens, run the release web build in a headless Chrome. One
+command builds, serves, drives and cleans up, and leaves the PNGs in
+`out/<run>/screens/`:
 
 ```bash
-flutter build web --release
-python3 -m http.server 8765 -d build/web &
-google-chrome --headless=new --remote-debugging-port=9333 \
-  --user-data-dir=/tmp/quadranti-chrome --window-size=412,860 about:blank &
-SHOTS=/tmp/shots bun tool/web_driver.ts goto:http://localhost:8765/ wait:3000 shot:login
+scripts/screens.sh goto:http://localhost:8765/ wait:3000 shot:login
+# Keep accounts and tasks between runs, skip the rebuild:
+scripts/screens.sh --no-build --profile /tmp/q-profile goto:http://localhost:8765/ wait:3000 shot:home
 ```
 
 Then read the PNG. Flutter web draws on a canvas, so click by coordinates
@@ -91,6 +93,6 @@ taken from the previous screenshot. Text goes into the focused field with
 - Editor: save is at (383, 28), and the sliders are at y ≈ 360 / 452 / 544 / 636
   (효과, 낭비, 즉시성, 착각), from x = 42 to x = 370.
 
-Put `scheme:dark` before `goto:` to see dark mode. The Chrome profile
-directory keeps IndexedDB between runs. Delete it to
-start again from a blank state.
+Put `scheme:dark` before `goto:` to see dark mode. Without `--profile`, every
+run starts from an empty browser (no accounts). A `--profile` directory keeps
+IndexedDB between runs; delete it to start again from a blank state.

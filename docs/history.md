@@ -55,4 +55,5 @@ This file only grows.
 ## Phase 6: Project structure and scenario tests
 
 - [x] 6.1 Docs follow the cling/kairos conventions: lowercase names, `docs/README.md` (index and conventions), and finished tasks moved from plan.md to this file. `bc309c7`
-- [x] 6.2 Add a root `CLAUDE.md`: what this is, a map of the docs, how we work, how to run and check, and what bites.
+- [x] 6.2 Add a root `CLAUDE.md`: what this is, a map of the docs, how we work, how to run and check, and what bites. `6128c0a`
+- [x] 6.3 Move the scripts to `scripts/` (with `scripts/README.md`), put run results in a gitignored `out/<YYMMDD_hhmmss>/`, and add `scripts/test/check.sh`.

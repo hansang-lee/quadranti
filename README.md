@@ -17,8 +17,8 @@ Flutter app for web and Android. Data stays on the device (Hive).
 Web version: https://hansang-lee.github.io/quadranti/ (deployed from `master` by CI).
 
 ```bash
-./serve.sh          # http://localhost:8000
-flutter test
+scripts/web.sh          # http://localhost:8000
+scripts/test/check.sh   # analyze + tests
 ```
 
 ## Docs
