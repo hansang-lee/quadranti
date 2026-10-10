@@ -132,6 +132,9 @@ class _ImportDialogState extends State<_ImportDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      // A small phone with the keyboard up leaves little height; scroll the
+      // content rather than overflow it over the buttons.
+      scrollable: true,
       title: const Text('백업 가져오기'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -141,7 +144,7 @@ class _ImportDialogState extends State<_ImportDialog> {
           TextField(
             key: const Key('backupText'),
             controller: _text,
-            maxLines: 6,
+            maxLines: 4,
             minLines: 3,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),

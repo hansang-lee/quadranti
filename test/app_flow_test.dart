@@ -357,6 +357,23 @@ void main() {
     expect(find.text('이 주에 등록된 태스크가 없습니다'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('the paste dialog fits a small phone with the keyboard up', (tester) async {
+    await pumpHome(tester);
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('백업'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('backupPaste')));
+    await tester.pumpAndSettle();
+    // 360 dp wide with a keyboard: about 400 dp of height left.
+    tester.view.physicalSize = const Size(360, 400);
+    await tester.enterText(find.byKey(const Key('backupText')), List.filled(40, '{"line": 1},').join('\n'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.byKey(const Key('importBackup')));
+    expect(find.byKey(const Key('importBackup')).hitTestable(), findsOneWidget);
+  });
 }
 
 class _FakeFiles implements BackupFiles {
