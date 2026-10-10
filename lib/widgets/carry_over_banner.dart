@@ -10,13 +10,13 @@ class CarryOverBanner extends StatelessWidget {
 
   final VoidCallback onDismiss;
 
-  /// For tests; defaults to the clock.
+  /// For tests; defaults to the task provider's clock.
   final DateTime? now;
 
   @override
   Widget build(BuildContext context) {
     final tasks = context.watch<TaskProvider>();
-    final thisWeek = weekStartOf(now ?? DateTime.now());
+    final thisWeek = weekStartOf(now ?? tasks.now());
     if (tasks.selectedWeek != thisWeek) return const SizedBox.shrink();
     final lastWeek = addWeeks(thisWeek, -1);
     final count = tasks.carryOverCandidates(lastWeek, thisWeek).length;

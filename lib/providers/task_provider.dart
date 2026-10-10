@@ -29,6 +29,10 @@ class TaskProvider with ChangeNotifier {
   bool _isLoading = false;
   DateTime _selectedWeek;
 
+  /// The provider's clock. Screens use it for "today" and "this week", so a
+  /// test or scenario that moves the clock moves the whole app.
+  DateTime now() => _clock();
+
   /// Every task of the current user, across all weeks.
   List<Task> get tasks => _tasks;
 
@@ -273,7 +277,7 @@ class TaskProvider with ChangeNotifier {
   /// Adds four example tasks, one per quadrant, to [selectedWeek].
   Future<void> loadSampleData() async {
     final week = _selectedWeek;
-    final stamp = DateTime.now().microsecondsSinceEpoch;
+    final stamp = _clock().microsecondsSinceEpoch;
     final samples = [
       Task(id: '$stamp-1', title: '핵심 프로젝트 마감', immediacy: 8, effectiveness: 9, weekStart: week),
       Task(id: '$stamp-2', title: '형식적인 회의', immediacy: 9, effectiveness: 2, waste: 8, illusion: 8, weekStart: week),

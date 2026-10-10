@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final auth = context.watch<AuthProvider>();
     final tasks = context.watch<TaskProvider>();
     final week = tasks.selectedWeek;
-    final relative = relativeWeekName(week);
+    final relative = relativeWeekName(week, now: tasks.now());
 
     return Scaffold(
       appBar: AppBar(
@@ -97,12 +97,12 @@ class _HomeScreenState extends State<HomeScreen> {
         titleSpacing: 0,
         title: InkWell(
           // Tapping the title jumps back to this week.
-          onTap: () => tasks.selectWeek(DateTime.now()),
+          onTap: () => tasks.selectWeek(tasks.now()),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(formatWeekRange(week), key: const Key('weekTitle')),
+              Text(formatWeekRange(week, now: tasks.now()), key: const Key('weekTitle')),
               Text(
                 relative ?? auth.currentUser?.displayName ?? '',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white70),

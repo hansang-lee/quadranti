@@ -11,14 +11,18 @@ import 'services/prefs.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  runApp(createApp());
+}
 
+/// The app with its providers wired: the signed-in user's tasks load
+/// whenever the user changes. Scenario tests call it with their own [clock].
+/// Hive must already be initialised.
+QuadrantiApp createApp({DateTime Function()? clock}) {
   final auth = AuthProvider();
-  final tasks = TaskProvider();
-  // Load the signed-in user's tasks whenever the user changes.
+  final tasks = TaskProvider(clock: clock);
   auth.addListener(() => tasks.setUser(auth.currentUser?.id));
   auth.checkAuthState();
-
-  runApp(QuadrantiApp(auth: auth, tasks: tasks, prefs: HivePrefs()));
+  return QuadrantiApp(auth: auth, tasks: tasks, prefs: HivePrefs());
 }
 
 class QuadrantiApp extends StatelessWidget {

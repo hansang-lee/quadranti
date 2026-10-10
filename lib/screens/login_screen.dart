@@ -117,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Display Name (signup only)
                   if (_isSignUp) ...[
                     _buildTextField(
+                      key: const Key('displayName'),
                       controller: _displayNameController,
                       hint: '이름 (선택)',
                       icon: Icons.person_outline,
@@ -126,6 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Email Input
                   _buildTextField(
+                    key: const Key('email'),
                     controller: _emailController,
                     hint: '이메일 주소',
                     icon: Icons.email_outlined,
@@ -135,6 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Password Input
                   _buildTextField(
+                    key: const Key('password'),
                     controller: _passwordController,
                     hint: '비밀번호',
                     icon: Icons.lock_outline,
@@ -148,6 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
+                      key: const Key('submit'),
                       onPressed: _isSubmitting ? null : _handleSubmit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -173,6 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Toggle Login / Signup
                   TextButton(
+                    key: const Key('toggleSignUp'),
                     onPressed: () => setState(() => _isSignUp = !_isSignUp),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white.withValues(alpha: 0.5),
@@ -278,6 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildTextField({
+    Key? key,
     required TextEditingController controller,
     required String hint,
     required IconData icon,
@@ -291,6 +297,7 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
+        key: key,
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
