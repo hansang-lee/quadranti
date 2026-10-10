@@ -44,9 +44,34 @@ jobs:
         with:
           path: build/web
 
+  # The scenario tests (integration_test/) in headless Chrome, with the
+  # runner's preinstalled Chrome and matching chromedriver. Screenshots and
+  # logs are kept as the 'scenarios' artifact on every run.
+  scenarios:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Scenario tests (web)
+        run: CHROMEDRIVER="$CHROMEWEBDRIVER/chromedriver" scripts/test/scenario.sh --web
+
+      - name: Keep screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scenarios
+          path: out/
+
   # Publishes https://hansang-lee.github.io/quadranti/ after a green master build.
   deploy:
-    needs: test
+    needs: [test, scenarios]
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
