@@ -11,6 +11,7 @@ English.
 | Script | What it does | Usage |
 |---|---|---|
 | `web.sh` | The app in a browser at http://localhost:8000 (Flutter web dev server; `R` hot-restarts). Uses the local Flutter, or the dev container without one. | `scripts/web.sh` · `PORT=8001 scripts/web.sh` |
+| `phone.sh` | Builds the release APK (debug-signed until PLAN 5.3) and installs it on the one phone plugged in over USB, keeping its data, then starts it. Never targets an emulator. Once installed the app needs no computer: all data is on the phone. | `scripts/phone.sh` · `--no-build` |
 | `docker.sh` | A shell (or one command) in the optional dev container (`Dockerfile`: Flutter 3.47.5 + Android SDK). | `scripts/docker.sh` · `scripts/docker.sh flutter test` |
 | `screens.sh` | Screenshots of the real web build in headless Chrome at 412x860: build, serve on :8765, run the steps of `web_driver.ts`, PNGs into `out/<run>/screens/`. A fresh browser profile each run unless `--profile DIR`. Needs Chrome and bun. | `scripts/screens.sh goto:http://localhost:8765/ wait:3000 shot:login` · `--no-build` · `--profile DIR` |
 | `web_driver.ts` | The DevTools-protocol driver `screens.sh` runs (steps: goto, click, drag, type, key, wait, shot, scheme, downloads). Run by hand only against a Chrome already on :9333. | `SHOTS=<dir> bun scripts/web_driver.ts <steps>` |

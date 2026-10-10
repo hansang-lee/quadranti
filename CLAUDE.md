@@ -56,7 +56,7 @@ scripts/web.sh              # web dev server on http://localhost:8000
 scripts/test/check.sh       # analyze + unit/widget tests; push only on "All checks passed."
 scripts/test/scenario.sh    # the scenario tests on the emulator (--web: headless Chrome), ~3 min
 scripts/screens.sh <steps>  # screenshots of the real web build (docs/development.md)
-flutter build apk --debug   # local Android SDK
+scripts/phone.sh            # release APK onto the phone plugged in over USB
 ```
 
 Every script is in `scripts/` and listed with its usage in
