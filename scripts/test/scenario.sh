@@ -58,7 +58,7 @@ for arg in "$@"; do
   esac
   pass+=("$arg")
 done
-cd "$ROOT"
+cd "$ROOT" || exit 1
 if [ ${#names[@]} -eq 0 ]; then
   for f in integration_test/*_test.dart; do names+=("$(basename "$f" _test.dart)"); done
 fi
@@ -92,6 +92,7 @@ SUMMARY="$RUN"
 [ -n "${SCENARIO_OUT_SUBDIR:-}" ] && SUMMARY="$OUT"
 [ -n "${SCENARIO_OUT_SUBDIR:-}" ] || echo "Run folder: ${RUN#$ROOT/}"
 bg_pids=()
+# shellcheck disable=SC2154 # p is the loop variable inside the trap string
 trap 'for p in "${bg_pids[@]}"; do kill "$p" 2>/dev/null; done' EXIT
 
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}}"

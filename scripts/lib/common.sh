@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Sourced by the scripts in scripts/: the repository root, Flutter on PATH,
 # and the helpers they share. Not run on its own.
 
@@ -18,7 +19,7 @@ usage_of() { sed -n '2,/^[^#]/p' "$1" | sed '$d' | sed 's/^# \{0,1\}//'; }
 # screenshots, a summary.txt), named by when it started; gitignored.
 # Only the newest $QUADRANTI_KEEP_RUNS (30) runs are kept. new_run_dir KIND
 # creates out/<stamp>/KIND and prints out/<stamp>. With QUADRANTI_RUN_DIR
-# set (scripts/test/all.sh) every script shares that one run folder.
+# set by a caller that runs several scripts, they share that one run folder.
 QUADRANTI_KEEP_RUNS="${QUADRANTI_KEEP_RUNS:-30}"
 new_run_dir() {
   if [ -n "${QUADRANTI_RUN_DIR:-}" ]; then
@@ -26,7 +27,8 @@ new_run_dir() {
     echo "$QUADRANTI_RUN_DIR"
     return
   fi
-  local dir="$ROOT/out/$(date +%y%m%d_%H%M%S)"
+  local dir
+  dir="$ROOT/out/$(date +%y%m%d_%H%M%S)"
   mkdir -p "$dir/$1"
   # Oldest first; everything but the newest QUADRANTI_KEEP_RUNS goes.
   find "$ROOT/out" -mindepth 1 -maxdepth 1 -type d -name '[0-9]*_[0-9]*' -printf '%f\n' 2>/dev/null |
