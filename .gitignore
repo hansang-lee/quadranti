@@ -17,3 +17,6 @@ Thumbs.db
 
 # run results (scripts/lib/common.sh new_run_dir)
 /out/
+
+# Agent worktrees (Claude Code)
+/.claude/worktrees/
