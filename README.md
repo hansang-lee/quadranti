@@ -24,7 +24,7 @@ git config core.hooksPath .githooks   # once per clone: check.sh before every pu
 
 ## Docs
 
-The index and the conventions for writing docs are in [docs/README.md](docs/README.md).
+The index and the project's exceptions to the shared conventions are in [docs/README.md](docs/README.md).
 
 - [docs/plan.md](docs/plan.md): roadmap and status. Start here.
 - [docs/concept.md](docs/concept.md): the four properties, the axis formula, the quadrants
