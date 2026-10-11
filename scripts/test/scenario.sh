@@ -13,6 +13,13 @@
 #                                            MATRIX_AVDS, one emulator at a time, into
 #                                            scenarios/<avd>/ (before a release)
 #
+#   scripts/test/scenario.sh --wait ...      wait for another run's emulator lock instead of stopping
+#
+# Emulator runs hold ~/.cache/android-emulator.lock (flock) for their whole
+# length, the same lock cling's scenario.sh takes, so two runs never stop
+# and boot each other's emulators (as happened on 2026-10-10, when both
+# projects' --matrix ran at once and spoiled each other's results).
+#
 # --web needs Google Chrome and a matching chromedriver: CHROMEDRIVER, or
 # chromedriver on PATH, or one downloaded once into ~/.cache/quadranti-chromedriver/.
 # --matrix stops every running emulator (cling's included), boots each matrix
@@ -35,6 +42,7 @@ MATRIX_AVDS=(cling_api28 cling_api33 cling_api36)
 web=false
 show=false
 matrix=false
+wait_lock=false
 names=()
 pass=()   # the arguments but --matrix, for each AVD's run in a matrix
 for arg in "$@"; do
@@ -42,7 +50,9 @@ for arg in "$@"; do
     --matrix) matrix=true; continue ;;
     --web) web=true ;;
     --show) show=true ;;
+    --wait) wait_lock=true ;;
     -h|--help) usage_of "$0"; exit 0 ;;
+    --*) echo "Unknown option $arg" >&2; exit 2 ;;
     *) names+=("${arg%_test.dart}") ;;
   esac
   pass+=("$arg")
@@ -50,6 +60,27 @@ done
 cd "$ROOT"
 if [ ${#names[@]} -eq 0 ]; then
   for f in integration_test/*_test.dart; do names+=("$(basename "$f" _test.dart)"); done
+fi
+
+# The emulators are shared between projects on this machine: take the lock
+# before touching one. A matrix's per-AVD runs inherit their parent's.
+LOCK="${ANDROID_EMULATOR_LOCK:-$HOME/.cache/android-emulator.lock}"
+if [ "$web" = false ] && [ -z "${SCENARIO_LOCK_HELD:-}" ]; then
+  mkdir -p "$(dirname "$LOCK")"
+  exec 9>>"$LOCK"
+  if ! flock -n 9; then
+    holder="$(cat "$LOCK.owner" 2>/dev/null || echo unknown)"
+    if [ "$wait_lock" = true ]; then
+      echo "Waiting for the emulator lock, held by: $holder ..."
+      flock 9
+    else
+      echo "Another scenario run holds the emulator lock ($LOCK): $holder" >&2
+      echo "Run again when it is done, or add --wait." >&2
+      exit 3
+    fi
+  fi
+  echo "quadranti scenario.sh $* (pid $$, since $(date '+%F %T'))" > "$LOCK.owner"
+  export SCENARIO_LOCK_HELD=1
 fi
 
 RUN="$(new_run_dir scenarios)"
@@ -83,14 +114,17 @@ kill_emulators() {
 }
 
 # boot_avd AVD LOG: boots AVD headless, waits for it and sets serial.
+# Extra emulator options come in EMU_EXTRA (a string, split on spaces).
 boot_avd() {
-  local avd=$1 log=$2
+  local avd=$1 log=$2 extra
+  read -r -a extra <<<"${EMU_EXTRA:-}"
   [ -x "$EMULATOR" ] || { echo "No emulator binary at $EMULATOR" >&2; return 1; }
   "$EMULATOR" -list-avds | grep -qx "$avd" || { echo "No AVD named $avd (see docs/testing.md, \"Devices\")" >&2; return 1; }
   echo "Booting $avd headless (log: ${log#$ROOT/}) ..."
   # -gpu host: with swiftshader the emulator's adb connection tends to
   # drop as a Flutter app starts (seen in cling).
-  nohup "$EMULATOR" -avd "$avd" -no-window -no-audio -no-boot-anim -gpu host -no-snapshot-save > "$log" 2>&1 &
+  nohup "$EMULATOR" -avd "$avd" -no-window -no-audio -no-boot-anim -gpu host -no-snapshot-save \
+    "${extra[@]+"${extra[@]}"}" > "$log" 2>&1 &
   serial=""
   for _ in $(seq 90); do serial="$(find_emulator)"; [ -n "$serial" ] && break; sleep 2; done
   [ -n "$serial" ] || { echo "The emulator did not come up; see $log" >&2; return 1; }
@@ -116,6 +150,9 @@ if [ "$matrix" = true ]; then
     exit 1
   fi
   export QUADRANTI_RUN_DIR="$RUN"
+  # A scenario that hangs (flutter drive waiting forever on the VM service)
+  # fails after this many seconds instead of stopping the matrix.
+  export SCENARIO_TIMEOUT="${SCENARIO_TIMEOUT:-600}"
   had_default=false
   for s in $(all_emulators); do [ "$(avd_of "$s")" = "$AVD" ] && had_default=true; done
   echo "Matrix: ${MATRIX_AVDS[*]}"
@@ -124,7 +161,12 @@ if [ "$matrix" = true ]; then
     echo; echo "== $avd =="
     mkdir -p "$OUT/$avd"
     kill_emulators
-    if ! boot_avd "$avd" "$OUT/$avd/emulator.log"; then
+    # -feature -Vulkan (found by cling's matrix, its f5a187f): on the Android
+    # 16 image Impeller draws with Vulkan on the host GPU and the emulator's
+    # adb connection drops the moment the app starts, so flutter drive never
+    # reaches the VM service. Without Vulkan Impeller uses OpenGL ES, as on
+    # the other images.
+    if ! EMU_EXTRA="-feature -Vulkan" boot_avd "$avd" "$OUT/$avd/emulator.log"; then
       summarize "$RUN" "$avd" "FAIL (did not boot)"; mfailed=1; continue
     fi
     version="$("$ADB" -s "$serial" shell getprop ro.build.version.release | tr -d '\r')"
@@ -196,7 +238,8 @@ for name in "${names[@]}"; do
   [ -f "$target" ] || { echo "No scenario $target" >&2; summarize "$SUMMARY" "$name" MISSING; failed=1; continue; }
   printf '%-16s ' "$name"
   start=$(date +%s)
-  SCENARIO_SHOTS_DIR="$OUT/screenshots" flutter drive --driver=test_driver/integration_test.dart \
+  # SCENARIO_TIMEOUT: 0 (no limit) unless --matrix set one.
+  SCENARIO_SHOTS_DIR="$OUT/screenshots" timeout "${SCENARIO_TIMEOUT:-0}" flutter drive --driver=test_driver/integration_test.dart \
     --target="$target" "${device_args[@]}" > "$OUT/logs/$name.log" 2>&1
   rc=$?
   took=$(( $(date +%s) - start ))
@@ -204,7 +247,7 @@ for name in "${names[@]}"; do
     echo "PASS (${took}s)"; summarize "$SUMMARY" "$name" "PASS (${took}s)"
   else
     echo "FAIL (${took}s, ${OUT#$ROOT/}/logs/$name.log)"; summarize "$SUMMARY" "$name" "FAIL (${took}s)"
-    grep -E "TestFailure|Timed out|Expected:|Actual:|Exception|Error:" "$OUT/logs/$name.log" | head -8 | sed 's/^/    /'
+    grep -E "TestFailure|Timed out|Expected:|Actual:|Exception|Error:" "$OUT/logs/$name.log" | grep -v "attempting to connect to the VM" | head -8 | sed 's/^/    /'
     failed=1
   fi
 done

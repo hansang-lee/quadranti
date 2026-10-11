@@ -112,9 +112,20 @@ done
 ```
 
 `--matrix` stops every running emulator first, and it checks that all its
-AVDs exist before stopping anything. Do not start it while another scenario
-run, this project's or cling's, is using an emulator. It boots `cling_e2e`
-again at the end if that was running before.
+AVDs exist before stopping anything. It boots `cling_e2e` again at the end
+if that was running before. It uses cling's matrix fixes (cling `f5a187f`):
+the AVDs boot with `-feature -Vulkan`, because on Android 16 Impeller's
+Vulkan path drops the emulator's adb connection, and each scenario is
+bounded by `SCENARIO_TIMEOUT` (600 s) so that a hang counts as a FAIL.
+
+**One emulator run at a time, across projects.** Every emulator run holds
+`~/.cache/android-emulator.lock` (`flock`) for its whole length, and writes
+who holds it to `android-emulator.lock.owner`. A second run stops with
+exit 3 and names the holder, or waits for it with `--wait`. On 2026-10-10
+quadranti's and cling's `--matrix` started a minute apart, stopped and
+booted each other's emulators, and spoiled both results. The lock only
+helps if cling's `scenario.sh` takes the same file, which was asked of the
+cling session the same day.
 
 ## How the scenarios are built
 
@@ -163,8 +174,8 @@ again at the end if that was running before.
 - File backup and restore through the system dialogs. These are not
   automatable here, so widget tests cover the app side through the
   `BackupFiles` seam.
-- The matrix has not run yet: it waits for cling's matrix AVDs, which are
-  being created in cling's session (2026-10-10).
+- The matrix has no clean result yet: the 2026-10-10 run overlapped cling's
+  (see above). Re-run it alone after cling's re-run.
 - Korean text wraps between any two syllables (seen at 200 % text). cling
   solved this with `ProseText`; see PLAN 3.12.
 - Dark mode in a scenario (`scheme:dark` is covered by `scripts/screens.sh`
