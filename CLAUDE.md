@@ -22,8 +22,9 @@ committed.
 | `docs/README.md` | The index of every document, and this project's exceptions to the shared conventions |
 | `docs/plan.md` | **Read first.** The current state and the open tasks by phase |
 | `docs/history.md` | Finished tasks, verbatim and by phase. A task id no longer in the plan is here |
-| `docs/decisions.md` | The decision table (D1, D2, …): every decision made or still open, with its date |
+| `docs/decisions.md` | The decision table (D1, D2, …): the question, the decision, who decided it and when |
 | `docs/concept.md` | The model: the four properties, the axis formula and the quadrants |
+| `docs/release.md` | How the web app (every green push) and the Android app ship, what is live, and how to undo a bad deploy |
 | `docs/testing.md` | The two test layers (unit/widget, scenario), how to run each, what each scenario covers, the backlog |
 | `docs/development.md` | The toolchain, running the app, the code layout and conventions, and screenshots of the web build |
 | `scripts/README.md` | Every script, its usage, and the `out/` layout |
@@ -89,10 +90,14 @@ It runs `check.sh` before a push (docs-only pushes skip it). Never use
 - **A push to `master` is a deploy.** Every green push publishes the web app
   within minutes. Push only after `check.sh` passes, never with
   `--no-verify`, and never force-push or rewrite history without the owner.
+  To undo a bad deploy, follow `docs/release.md` ("Undoing a bad deploy");
+  taking the site down needs the owner's word.
 - Emulator runs share `~/.cache/android-emulator.lock` with cling; do not
   stop another project's emulator by hand.
 - `scripts/phone.sh` installs onto the owner's phone and keeps its data;
-  run it only when asked.
+  run it only when asked. Never uninstall the app there: that deletes the
+  owner's tasks (an APK signed on another machine needs exactly that, see
+  `docs/release.md`).
 
 ## Things that bite
 

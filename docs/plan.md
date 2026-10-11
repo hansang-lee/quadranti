@@ -79,4 +79,5 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 - [ ] 5.3 👤 Android release signing (keystore kept out of git) and a Play Console listing.
 - [ ] 5.4 Privacy note: what is stored, and where.
 - [ ] 5.5 Before each release, run `scripts/test/scenario.sh --matrix` (Android 9, 13 and 16) and go through the real-device checklist on a Samsung phone: the file save and open dialogs, the back gesture, the 3-button and gesture navigation bars, the keyboard over the editor and the paste dialog, a 200 % font, and dark mode. Same plan as cling (its 5.41).
+- [ ] 5.7 Show the build in the app (the version from `pubspec.yaml` and the commit, passed with `--dart-define` by CI and `phone.sh`) instead of the fixed `v0.1`, so a report says which build it came from (`release.md`, "Gaps").
 - [ ] 5.6 👤 Read Google Play's pre-launch report: an internal-testing upload runs the app on real devices, Samsung included, and reports crashes, layout and accessibility issues with screenshots. Free, and it needs 5.3 first.

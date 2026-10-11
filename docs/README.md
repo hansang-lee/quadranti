@@ -11,8 +11,9 @@ and what comes next. Agents read [../CLAUDE.md](../CLAUDE.md) first.
 | [conventions.md](conventions.md) | reference | This repository's copy of the owner's shared conventions, synced from the template (`~/.claude/project-conventions.md`); exceptions are below. |
 | [plan.md](plan.md) | status | The current state and the open tasks by phase. Kept current. |
 | [history.md](history.md) | record | Finished tasks, verbatim and by phase. A task id no longer in plan.md is here. |
-| [decisions.md](decisions.md) | decision | The decision table D1, D2, …: every decision, made or open, with its date. |
+| [decisions.md](decisions.md) | decision | The decision table D1, D2, …: the question, the decision, and who decided it when (open ones wait for the owner). |
 | [concept.md](concept.md) | reference | The four properties, the axis formula and the quadrants: the model the app is built on. |
+| [release.md](release.md) | how-to | How the web app and the Android app ship, what is live, and how to undo a bad deploy. |
 | [testing.md](testing.md) | how-to | The test layers (unit/widget, scenario), how to run each, what each scenario covers, the backlog. |
 | [development.md](development.md) | how-to | The toolchain, running the app, the code layout and conventions, and screenshots of the web build. |
 
