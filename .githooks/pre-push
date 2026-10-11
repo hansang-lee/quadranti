@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# pre-push: run scripts/test/check.sh before anything leaves this machine,
+# unless the push changes documentation only. A green push to master deploys
+# the public web app, so this is the check (CLAUDE.md).
+#
+# Enable once per clone:   git config core.hooksPath .githooks
+# Never bypass it with --no-verify; fix what check.sh reports instead.
+#
+# Docs only means every changed file is a *.md file or under docs/ (both
+# sides of a rename count). Anything else, or a push whose changes cannot be
+# worked out, runs the full check.
+#
+# QUADRANTI_CHECK_CMD overrides the command, for testing this hook only; never
+# set it to get a push through. The default is scripts/test/check.sh at the root.
+set -euo pipefail
+
+remote="${1:-origin}"
+root="$(git rev-parse --show-toplevel)"
+
+is_zero() { [[ "$1" =~ ^0+$ ]]; }
+
+# Where a new branch or tag forks from: the remote's master as last fetched.
+base_ref() {
+  local ref
+  for ref in "refs/remotes/$remote/master" "refs/remotes/origin/master"; do
+    if git rev-parse -q --verify "$ref^{commit}" >/dev/null; then
+      echo "$ref"
+      return 0
+    fi
+  done
+  return 1
+}
+
+needs_check=false
+pushed_any=false
+changed=""
+
+# One line per ref: <local ref> <local sha> <remote ref> <remote sha>.
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -n "${local_ref:-}" ] || continue
+  if is_zero "$local_sha"; then
+    continue # deleting a remote ref: nothing to check
+  fi
+  pushed_any=true
+  if ! head="$(git rev-parse -q --verify "$local_sha^{commit}")"; then
+    needs_check=true
+    continue
+  fi
+
+  if is_zero "$remote_sha"; then
+    # A new branch or tag: what it adds on top of master.
+    if ! base="$(base_ref)" || ! from="$(git merge-base "$base" "$head")"; then
+      echo "pre-push: cannot tell what $remote_ref adds, running checks"
+      needs_check=true
+      continue
+    fi
+  elif git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+    from="$remote_sha"
+  else
+    echo "pre-push: $remote_ref on the remote is not known here, running checks"
+    needs_check=true
+    continue
+  fi
+
+  changed+="$(git diff --name-only --no-renames "$from" "$head")"$'\n'
+done
+
+if [ "$pushed_any" = false ]; then
+  exit 0
+fi
+
+if [ "$needs_check" = false ]; then
+  all="$(printf '%s' "$changed" | grep -v '^$' || true)"
+  code="$(printf '%s\n' "$all" | grep -v -e '^$' -e '\.md$' -e '^docs/' || true)"
+  if [ -z "$all" ]; then
+    echo "pre-push: no file changes, skipping checks"
+    exit 0
+  fi
+  if [ -z "$code" ]; then
+    echo "pre-push: docs-only push, skipping checks"
+    exit 0
+  fi
+fi
+
+echo "pre-push: running ${QUADRANTI_CHECK_CMD:-scripts/test/check.sh} ..."
+# The ref list is on stdin; keep the check away from it.
+if [ -n "${QUADRANTI_CHECK_CMD:-}" ]; then
+  run_check() { bash -c "$QUADRANTI_CHECK_CMD"; }
+else
+  run_check() { "$root/scripts/test/check.sh"; }
+fi
+if (cd "$root" && run_check) </dev/null; then
+  exit 0
+fi
+echo "pre-push: checks failed, push blocked (fix them; never --no-verify)" >&2
+exit 1
