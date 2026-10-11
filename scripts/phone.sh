@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Builds the release APK (signed with the debug key until PLAN 5.3) and
 # installs it on the phone plugged in over USB, keeping the app's data.
 # Never touches an emulator. The app needs no computer or server once
@@ -8,7 +8,7 @@
 #   scripts/phone.sh --no-build install the last build
 set -euo pipefail
 source "$(dirname "$0")/lib/common.sh"
-[ "${1:-}" = "--help" ] && { usage_of "$0"; exit 0; }
+case "${1:-}" in -h|--help) usage_of "$0"; exit 0 ;; esac
 
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}}"
 ADB="$SDK/platform-tools/adb"

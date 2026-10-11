@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # The scenario tests (integration_test/): the real app on real storage,
 # one user journey per file, with a screenshot per step. Runs on an Android
 # emulator (the cling_e2e AVD, booted headless if none is running; never on
@@ -26,6 +26,7 @@
 # AVD in turn, runs the scenarios on it and shuts it down; a cling_e2e that
 # was running before is booted again at the end. Do not start it while
 # another scenario run (this project's or cling's) is using an emulator.
+# No -e: the steps must all run so the summary reports every result.
 set -uo pipefail
 source "$(dirname "$0")/../lib/common.sh"
 require_flutter

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Screenshots of the real web build: builds it (unless --no-build), serves
 # it on :8765, starts a headless Chrome (412x860) and runs the given steps
 # through scripts/web_driver.ts. PNGs land in out/<YYMMDD_hhmmss>/screens/.
@@ -10,7 +10,7 @@
 #   scripts/screens.sh --no-build --profile /tmp/q-profile scheme:dark goto:http://localhost:8765/ wait:3000 shot:home
 set -euo pipefail
 source "$(dirname "$0")/lib/common.sh"
-[ "${1:-}" = "--help" ] && { usage_of "$0"; exit 0; }
+case "${1:-}" in -h|--help) usage_of "$0"; exit 0 ;; esac
 
 BUILD=1
 PROFILE=""

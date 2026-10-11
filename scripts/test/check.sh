@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # What CI runs before deploying: flutter analyze and the unit + widget
 # tests, with logs in out/<YYMMDD_hhmmss>/app/ and a summary.txt. Ends with
 # "All checks passed." or prints the failing log. --build also builds the
@@ -6,9 +6,10 @@
 #
 #   scripts/test/check.sh
 #   scripts/test/check.sh --build
+# No -e: the steps must all run so the summary reports every result.
 set -uo pipefail
 source "$(dirname "$0")/../lib/common.sh"
-[ "${1:-}" = "--help" ] && { usage_of "$0"; exit 0; }
+case "${1:-}" in -h|--help) usage_of "$0"; exit 0 ;; esac
 require_flutter
 
 BUILD=0
