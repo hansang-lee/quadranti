@@ -40,7 +40,7 @@ document says what the code now does.
   and names the task or decision (`PLAN 5.3`, `D10`). Older history uses the
   plain `type: subject` form.
 - The shared rules for all the owner's projects are in
-  `~/.claude/project-conventions.md`; `docs/README.md` lists this project's
+  `docs/conventions.md`; `docs/README.md` lists this project's
   exceptions.
 - **Plan-driven.** Work follows `docs/plan.md`. New problems found along the
   way get a numbered task in the plan, not a silent fix or a forgotten note.

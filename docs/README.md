@@ -8,6 +8,7 @@ and what comes next. Agents read [../CLAUDE.md](../CLAUDE.md) first.
 
 | File | Kind | What it is |
 |---|---|---|
+| [conventions.md](conventions.md) | reference | This repository's copy of the owner's shared conventions, synced from the template (`~/.claude/project-conventions.md`); exceptions are below. |
 | [plan.md](plan.md) | status | The current state and the open tasks by phase. Kept current. |
 | [history.md](history.md) | record | Finished tasks, verbatim and by phase. A task id no longer in plan.md is here. |
 | [decisions.md](decisions.md) | decision | The decision table D1, D2, …: every decision, made or open, with its date. |
@@ -18,7 +19,7 @@ and what comes next. Agents read [../CLAUDE.md](../CLAUDE.md) first.
 ## Conventions
 
 Naming, where a document goes, how it is written and when it changes follow
-the owner's shared conventions in `~/.claude/project-conventions.md` (adopted
+the owner's shared conventions in [`conventions.md`](conventions.md) (adopted
 2026-10-11; sections 1 and 3 for documents, 4 for scripts). Read that file
 before changing the layout, docs, scripts or tooling. Quadranti's own
 exceptions, with the reason:
