@@ -19,7 +19,7 @@ committed.
 
 | Document | What it answers |
 |---|---|
-| `docs/README.md` | The index of every document, and the conventions for naming, placing and writing them |
+| `docs/README.md` | The index of every document, and this project's exceptions to the shared conventions |
 | `docs/plan.md` | **Read first.** The current state and the open tasks by phase |
 | `docs/history.md` | Finished tasks, verbatim and by phase. A task id no longer in the plan is here |
 | `docs/decisions.md` | The decision table (D1, D2, …): every decision made or still open, with its date |
@@ -34,8 +34,14 @@ document says what the code now does.
 
 ## How we work
 
-- **One commit per finished unit of work**, pushed straight away. Commit
-  messages say *why*, not just what.
+- **One commit per finished unit of work**, pushed straight away. The subject
+  is `type(scope): what changed` (types `feat fix refactor test docs build ops
+  chore`; scopes such as `app`, `scripts`, `readme`), and the body says *why*
+  and names the task or decision (`PLAN 5.3`, `D10`). Older history uses the
+  plain `type: subject` form.
+- The shared rules for all the owner's projects are in
+  `~/.claude/project-conventions.md`; `docs/README.md` lists this project's
+  exceptions.
 - **Plan-driven.** Work follows `docs/plan.md`. New problems found along the
   way get a numbered task in the plan, not a silent fix or a forgotten note.
 - **Decisions go in `docs/decisions.md`**, with the date. Rows marked
@@ -53,7 +59,7 @@ document says what the code now does.
 
 ```bash
 scripts/web.sh              # web dev server on http://localhost:8000
-scripts/test/check.sh       # analyze + unit/widget tests; push only on "All checks passed."
+scripts/test/check.sh       # shellcheck + analyze + unit/widget tests; push only on "All checks passed."
 scripts/test/scenario.sh    # the scenario tests on the emulator (--web: headless Chrome), ~3 min
 scripts/test/scenario.sh --matrix   # the same on Android 9/13/16 (cling's AVDs), before a release
 scripts/screens.sh <steps>  # screenshots of the real web build (docs/development.md)
@@ -69,6 +75,24 @@ pull request, and the web scenarios too. It deploys from `master` only when
 both pass. The repository is public, so Actions minutes are free. After a
 change to a screen flow, run the scenarios on the emulator as well (CI
 covers only web).
+
+Enable the pre-push hook once per clone: `git config core.hooksPath .githooks`.
+It runs `check.sh` before a push (docs-only pushes skip it). Never use
+`--no-verify`. `check.sh` runs shellcheck in Docker, so Docker must be up.
+
+## Safety
+
+- **The repository is public.** Nothing secret is committed: no keystore,
+  `key.properties`, tokens or personal data. The Android release keystore
+  (PLAN 5.3) stays out of git. There are no secrets in the repo today, so
+  there is no `.env.example`.
+- **A push to `master` is a deploy.** Every green push publishes the web app
+  within minutes. Push only after `check.sh` passes, never with
+  `--no-verify`, and never force-push or rewrite history without the owner.
+- Emulator runs share `~/.cache/android-emulator.lock` with cling; do not
+  stop another project's emulator by hand.
+- `scripts/phone.sh` installs onto the owner's phone and keeps its data;
+  run it only when asked.
 
 ## Things that bite
 

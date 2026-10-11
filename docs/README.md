@@ -1,8 +1,8 @@
 # Quadranti documentation
 
-This page indexes every document and sets the conventions for writing them.
-Start with [plan.md](plan.md): what exists, what is open and what comes next.
-Agents read [../CLAUDE.md](../CLAUDE.md) first.
+This page indexes every document and lists this project's exceptions to the
+shared conventions. Start with [plan.md](plan.md): what exists, what is open
+and what comes next. Agents read [../CLAUDE.md](../CLAUDE.md) first.
 
 ## Index
 
@@ -17,47 +17,19 @@ Agents read [../CLAUDE.md](../CLAUDE.md) first.
 
 ## Conventions
 
-These were adopted 2026-10-10 from cling (its `docs/README.md`), which took
-them from kairos. They follow the Google documentation guide: docs live in
-the repo, change in the same commit as the code they describe, and are
-deleted when stale rather than left to mislead. They also follow the Google
-developer style guide for file names, and Diátaxis (one kind of document per
-file).
+Naming, where a document goes, how it is written and when it changes follow
+the owner's shared conventions in `~/.claude/project-conventions.md` (adopted
+2026-10-11; sections 1 and 3 for documents, 4 for scripts). Read that file
+before changing the layout, docs, scripts or tooling. Quadranti's own
+exceptions, with the reason:
 
-**Names.** Use lowercase words joined by hyphens: `plan.md`,
-`development.md`. Dated records are named by their ISO 8601 date
-(`reviews/2026-10-07.md`). The only upper-case names are the conventional
-root files `README.md`, `CLAUDE.md` and `CHANGELOG.md`.
-
-**Where a document goes.**
-
-| Folder | Holds | Changes |
-|---|---|---|
-| `docs/` | Plan, decisions, history, and how-tos and references about the system as it is | Edited in place and kept current (history only grows) |
-| `docs/reviews/` | One review per file, with its findings and their status (none yet: reviews so far became plan tasks) | The status is updated; findings are not rewritten |
-
-Decisions stay one table in `decisions.md`, not one file each. A row is never
-edited to say something else; a new row supersedes it.
-
-**Inside a document.**
-
-- Use one `#` title that matches what the file is, then `##` sections and
-  `###` subsections.
-- The first paragraph says what the document is for and who reads it.
-- Write in English, because agents read these. Answer the owner in Korean.
-- Lead with the point. Write dates as `2026-10-10`. Say why, and what went
-  wrong before.
-- Use tables for items compared on several attributes, and numbered lists
-  for steps.
-- Refer to a task as "PLAN 4.2" and to a decision as "D10". The ids survive
-  renames.
-
-**Changing documents.**
-
-- A code change that alters behaviour described in a doc updates that doc in
-  the same commit.
-- A task is finished when its plan entry is ticked and moved to
-  history.md, and the affected doc says what the code now does.
-- Renaming or moving a doc updates every reference in the same commit:
-  `git grep` the old name, including code comments, scripts, configs and
-  workflows.
+| Exception | Why |
+|---|---|
+| No `.env.example` | There are no secrets: the app has no server, no API keys and no accounts outside the device. The Android release keystore (PLAN 5.3) will stay out of git. If a secret ever appears, add `.env.example` then. |
+| No `scripts/export-local.sh` / `import-local.sh` | There is no local state outside git. User data lives in the browser's IndexedDB or on the phone and has its own in-app backup (`TaskBackup`, D3). Development needs no secrets. Revisit with the release keystore (PLAN 5.3). |
+| No `CHANGELOG.md` | Nothing is shipped to users as a versioned artifact yet; the web app is deployed continuously. Add one with the first store release. |
+| No `docs/reviews/` | No review has been written as a file; reviews so far became plan tasks. |
+| `scripts/web_driver.ts` | A TypeScript helper for `screens.sh`. Source files follow their language's naming (section 1); `snake_case` matches the Dart files. |
+| `check.sh` and `scenario.sh` use `set -uo pipefail` | They must run every step to report every result (section 4). Each says so in a comment. |
+| shellcheck fails on warnings only | Style-level notes (such as quoting inside `${x#$y}`) are not enforced. |
+| Older commits use `type: subject` | The `type(scope):` form (section 7) applies from 2026-10-11; history is not rewritten. |
