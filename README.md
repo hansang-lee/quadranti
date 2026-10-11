@@ -18,7 +18,8 @@ Web version: https://hansang-lee.github.io/quadranti/ (deployed from `master` by
 
 ```bash
 scripts/web.sh          # http://localhost:8000
-scripts/test/check.sh   # analyze + tests
+scripts/test/check.sh   # shellcheck, analyze, tests
+git config core.hooksPath .githooks   # once per clone: check.sh before every push
 ```
 
 ## Docs

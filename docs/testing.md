@@ -48,7 +48,7 @@ Results go to `out/<YYMMDD_hhmmss>/` (gitignored, newest 30 kept):
 ```
 out/261010_130151/
   summary.txt                 PASS/FAIL per check or scenario, then the result
-  app/                        check.sh: analyze.log, test.log
+  app/                        check.sh: shellcheck.log, analyze.log, test.log
   scenarios/logs/<name>.log   flutter drive output per scenario
   scenarios/screenshots/      <scenario>_<nn>_<step>.png; <..>_TIMEOUT.png when a wait gave up
   scenarios/chromedriver.log  --web only

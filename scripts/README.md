@@ -2,9 +2,10 @@
 
 Every script for working on Quadranti locally: running the app, the dev
 container, checks, scenario tests and screenshots. What each test layer
-covers is in [docs/testing.md](../docs/testing.md). Run them from the repository root
-(`scripts/<name>`); each prints its usage with `--help`. Script output is in
-English.
+covers is in [docs/testing.md](../docs/testing.md). Run them from anywhere (each
+changes to the repository root itself); each prints its usage, taken from its
+header comment, with `--help`. Script output is in English. Shell is 2-space
+indented and shellcheck clean (`test/check.sh` enforces it).
 
 ## Everyday
 
@@ -20,7 +21,7 @@ English.
 
 | Script | What it does | Usage |
 |---|---|---|
-| `test/check.sh` | What CI runs before deploying: `flutter analyze` and the unit + widget tests, logs in `out/<run>/app/`. Ends with "All checks passed." or prints the failing log. | `scripts/test/check.sh` · `--build` (also the release web build) |
+| `test/check.sh` | What CI runs before deploying, and what `.githooks/pre-push` runs: shellcheck (pinned Docker image, over `scripts/` and `.githooks/`), `flutter analyze` and the unit + widget tests, logs in `out/<run>/app/`. Ends with "All checks passed." or prints the failing log. | `scripts/test/check.sh` · `--build` (also the release web build) |
 | `test/scenario.sh` | The scenario tests (`integration_test/`) through `flutter drive`: on the `cling_e2e` emulator (booted headless if none runs; never a phone), or with `--web` in headless Chrome (chromedriver from `CHROMEDRIVER`, PATH, or fetched once into `~/.cache/quadranti-chromedriver/`). Logs and a screenshot per step in `out/<run>/scenarios/`. CI runs `--web`. `--matrix` runs the same on each Android version in `MATRIX_AVDS` (cling's `cling_api28/33/36`), one emulator at a time, into `scenarios/<avd>/`; it stops running emulators first (after checking every matrix AVD exists) and restores `cling_e2e`. Emulator runs hold `~/.cache/android-emulator.lock` (shared with cling); a second run stops with exit 3 unless `--wait`. | `scripts/test/scenario.sh` · `scripts/test/scenario.sh repeat backup` · `--web` · `--web --show` · `--matrix` · `--wait` |
 
 ## Results (`out/`)
@@ -31,7 +32,7 @@ Every run of `check.sh`, `scenario.sh` or `screens.sh` leaves what it produced i
 ```
 out/261010_143015/
   summary.txt   what ran and PASS/FAIL per part, then the result
-  app/          check.sh: pub-get.log, analyze.log, test.log (build.log with --build)
+  app/          check.sh: pub-get.log, shellcheck.log, analyze.log, test.log (build.log with --build)
   scenarios/    scenario.sh: logs/<name>.log, screenshots/<name>_<nn>_<step>.png, chromedriver.log (--web)
   screens/      screens.sh: the PNGs, build.log, chrome.log, http.log
 ```

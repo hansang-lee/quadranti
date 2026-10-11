@@ -23,11 +23,20 @@ Android (D3, D4).
 ## Check
 
 ```bash
-scripts/test/check.sh       # analyze + unit/widget tests, logs in out/<run>/; "All checks passed."
+scripts/test/check.sh       # shellcheck + analyze + unit/widget tests, logs in out/<run>/; "All checks passed."
 scripts/test/check.sh --build   # and the release web build, as CI does
 flutter test test/repeat_test.dart --plain-name 'missed weeks'   # one file or test
 flutter build apk --debug   # local Android SDK at ~/Android/Sdk; ~1 min (not in CI)
 ```
+
+The shellcheck step runs the pinned `koalaman/shellcheck:v0.10.0` image, so it
+needs Docker. Enable the pre-push hook once per clone:
+
+```bash
+git config core.hooksPath .githooks   # pre-push runs check.sh; docs-only pushes skip it
+```
+
+Never push with `--no-verify`: a green push to `master` deploys the public site.
 
 CI (`.github/workflows/ci.yml`) runs `check.sh` and the web build on every
 push and pull request, then deploys `master` to GitHub Pages. Every script
@@ -50,6 +59,7 @@ lib/
 test/                        unit + widget tests, one file per unit; app_flow_test.dart drives HomeScreen end to end
 integration_test/            scenario tests (docs/testing.md); support/scenario.dart is their driver
 test_driver/                 flutter drive's host side: saves the scenario screenshots
+.githooks/                   pre-push: runs scripts/test/check.sh (enable with core.hooksPath)
 scripts/                     web.sh, docker.sh, screens.sh + web_driver.ts, test/check.sh; see scripts/README.md
 out/                         run results (gitignored), one folder per run
 ```
