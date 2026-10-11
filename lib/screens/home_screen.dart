@@ -10,6 +10,7 @@ import 'backup_dialogs.dart';
 import 'graph_view.dart';
 import 'guide_screen.dart';
 import 'list_view.dart';
+import 'month_view.dart';
 import 'task_editor_screen.dart';
 
 enum _MenuAction { guide, carryOver, samples, backup, signOut }
@@ -29,10 +30,19 @@ class _HomeScreenState extends State<HomeScreen> {
   // Closing the carry-over banner hides it until the app restarts.
   bool _carryOverDismissed = false;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    GraphView(),
-    TaskListView(),
-  ];
+  static const _graphTab = 0, _listTab = 1, _monthTab = 2;
+
+  Widget _tab(int index) => switch (index) {
+        _graphTab => const GraphView(),
+        _listTab => const TaskListView(),
+        _ => MonthView(onOpenWeek: _openWeek),
+      };
+
+  /// From the month view: show [week]'s tasks in the list.
+  void _openWeek(DateTime week) {
+    context.read<TaskProvider>().selectWeek(week);
+    setState(() => _selectedIndex = _listTab);
+  }
 
   @override
   void initState() {
@@ -141,10 +151,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                if (!_carryOverDismissed)
+                // The banner and summary are about the selected week, which the
+                // month view does not show on its own.
+                if (!_carryOverDismissed && _selectedIndex != _monthTab)
                   CarryOverBanner(onDismiss: () => setState(() => _carryOverDismissed = true)),
-                if (tasks.weekTasks.isNotEmpty) WeekSummary(tasks: tasks.weekTasks),
-                Expanded(child: _widgetOptions.elementAt(_selectedIndex)),
+                if (tasks.weekTasks.isNotEmpty && _selectedIndex != _monthTab) WeekSummary(tasks: tasks.weekTasks),
+                Expanded(child: _tab(_selectedIndex)),
               ],
             ),
       bottomNavigationBar: BottomNavigationBar(
@@ -156,6 +168,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
             label: '목록',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month),
+            label: '달력',
           ),
         ],
         currentIndex: _selectedIndex,

@@ -34,5 +34,14 @@ void main() {
     expect(s.tasks.weekTasks.map((t) => t.title), ['못 끝낸 일']);
     expect(find.byKey(const Key('carryOverBanner')), findsNothing);
     await s.shot('carried_over');
+
+    // The month view lists the week with its task; a tap opens it.
+    await s.tap(find.text('달력'));
+    await s.waitFor(find.byKey(const Key('monthTitle')), what: 'the month view');
+    expect(find.text('못 끝낸 일'), findsOneWidget);
+    await s.shot('month');
+    await s.tap(find.text('못 끝낸 일'));
+    expect(find.text('이번 주'), findsOneWidget);
+    expect(find.widgetWithText(ListTile, '못 끝낸 일'), findsOneWidget);
   });
 }

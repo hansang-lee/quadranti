@@ -65,7 +65,7 @@ included. A failed check also keeps its `out/` as the `out` artifact.
 | `first_run` | Sign up, read the guide, see the empty week, load the samples, view the graph and the list | The guide opens once on arrival; one sample per quadrant |
 | `task_lifecycle` | Add a task with sliders, open it from its dot on the graph, re-rate it, tick it done, swipe-delete and undo | The editor's live quadrant card; saved scores equal the slider positions; graph hit-testing |
 | `persistence` | Add and tick a task, cold-start the app, then switch to another account and back | The session and the task (scores, done) survive a restart; a second account sees nothing |
-| `week_flow` | Step to next week and back, then let a week pass and accept the carry-over banner | The 이번 주 / 다음 주 labels; the banner moves only the unfinished task |
+| `week_flow` | Step to next week and back, let a week pass and accept the carry-over banner, then find the week in the 달력 tab and open it | The 이번 주 / 다음 주 labels; the banner moves only the unfinished task; the month view lists it and opens its week |
 | `repeat` | Make a weekly task, cold-start a week later, then turn repeat off and let another week pass | One fresh open copy per week (D10); nothing after stopping |
 | `backup` | Load samples plus a weekly task, copy the backup, sign up a second account and paste it | Tasks and the repeat rule arrive (version 2); copy failure is reported on web |
 

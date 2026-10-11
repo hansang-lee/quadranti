@@ -41,6 +41,7 @@ This file only grows.
 - [x] 3.9 Each graph dot has a semantics node (titles, quadrant, x/y; `QuadrantPainter.semanticsBuilder`). Activating a task stays with the list view. `13c0978`
 - [x] 3.10 Tasks with the same scores share one dot: titles stacked beside it ("외 n개" past three), and a tap asks which task to open. `fa9263b`
 - [x] 3.11 On a 360 dp phone the + button covers the lower-right corner of the graph (the 계획 quadrant); seen in the 2026-10-10 scenario screenshots. Leave room for it, or move it while the graph shows. Fixed 2026-10-10: the graph sits at the top and keeps 88 dp clear above the bottom edge for the button; a widget test checks five screen sizes.
+- [x] 3.13 A third tab, 달력: the month as rows of weeks with each week's quadrant counts, done count and open titles; arrows change the month, a tap on a week opens it in the list (D11). Asked for by the owner 2026-10-11.
 
 ## Phase 4: Data safety and accounts
 

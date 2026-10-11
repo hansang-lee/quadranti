@@ -45,7 +45,7 @@ lib/
   providers/                 AuthProvider, TaskProvider (state for the selected week; writes go through TaskRepository)
   services/                  AuthService + LocalAuthService (Hive), TaskRepository + Hive/Memory implementations
                              (tasks and repeat rules), TaskBackup (JSON v2), BackupFiles (file_picker seam), Prefs
-  screens/                   login, home (week bar, menu, FAB), graph_view, list_view, task_editor_screen
+  screens/                   login, home (week bar, menu, FAB, three tabs), graph_view, list_view, month_view, task_editor_screen
   widgets/                   QuadrantPainter (drawing, groupByPosition, tasksAt hit test), EmptyWeek
 test/                        unit + widget tests, one file per unit; app_flow_test.dart drives HomeScreen end to end
 integration_test/            scenario tests (docs/testing.md); support/scenario.dart is their driver

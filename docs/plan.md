@@ -26,6 +26,7 @@ Tasks marked 👤 need the owner (a decision, an account, or a device in hand).
 - The local email login works (D4 is open). Each user's tasks are stored in
   their own Hive box and survive reloads. Unreadable records are skipped
   rather than hiding everything.
+- Three tabs: 그래프, 목록 and 달력 (the month as rows of weeks, D11).
 - Week view: the app bar steps through weeks, and tapping the title jumps to
   this week. A summary line shows the count per quadrant and 완료 n/m. On this
   week, a banner offers to bring over last week's unfinished tasks.

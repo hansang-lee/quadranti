@@ -9,6 +9,7 @@ import 'package:quadranti/providers/auth_provider.dart';
 import 'package:quadranti/providers/task_provider.dart';
 import 'package:quadranti/screens/guide_screen.dart';
 import 'package:quadranti/screens/home_screen.dart';
+import 'package:quadranti/screens/month_view.dart';
 import 'package:quadranti/services/backup_files.dart';
 import 'package:quadranti/services/prefs.dart';
 import 'package:quadranti/services/task_repository.dart';
@@ -389,6 +390,61 @@ void main() {
       expect(graph.width, greaterThan(200));
     });
   }
+
+  testWidgets('month tab: weeks with their tasks, a tap opens that week in the list', (tester) async {
+    await pumpHome(tester);
+    final thisWeek = tasks.selectedWeek;
+    final nextWeek = addWeeks(thisWeek, 1);
+    await tasks.addTask(Task(id: 'a', title: '이번 주 일', weekStart: thisWeek, effectiveness: 9, immediacy: 9));
+    await tasks.addTask(Task(id: 'b', title: '다음 주 일', weekStart: nextWeek, done: true));
+
+    await tester.tap(find.text('달력'));
+    await tester.pumpAndSettle();
+    expect(find.text(formatMonth(monthOfWeek(thisWeek))), findsOneWidget);
+    expect(find.byKey(const Key('monthToday')), findsOneWidget);
+    // The banner and the week summary belong to the graph and list tabs.
+    expect(find.byKey(const Key('summary_done')), findsNothing);
+
+    final thisRow = find.byKey(Key('monthWeek_${formatDateKey(thisWeek)}'));
+    expect(find.descendant(of: thisRow, matching: find.text('이번 주 일')), findsOneWidget);
+    expect(find.descendant(of: thisRow, matching: find.text('완료 0/1')), findsOneWidget);
+
+    // Next week may sit in the next month.
+    var nextRow = find.byKey(Key('monthWeek_${formatDateKey(nextWeek)}'));
+    if (nextRow.evaluate().isEmpty) {
+      await tester.tap(find.byKey(const Key('nextMonth')));
+      await tester.pumpAndSettle();
+      nextRow = find.byKey(Key('monthWeek_${formatDateKey(nextWeek)}'));
+    }
+    // A finished task counts but its title is not listed.
+    expect(find.descendant(of: nextRow, matching: find.text('완료 1/1')), findsOneWidget);
+    expect(find.descendant(of: nextRow, matching: find.text('다음 주 일')), findsNothing);
+
+    await tester.ensureVisible(nextRow);
+    await tester.tap(nextRow);
+    await tester.pumpAndSettle();
+    expect(tasks.selectedWeek, nextWeek);
+    expect(find.text('다음 주 일'), findsOneWidget); // now in the list tab
+    expect(find.text('다음 주'), findsOneWidget);
+  });
+
+  testWidgets('month tab: arrows change the month, the title comes back to today', (tester) async {
+    await pumpHome(tester);
+    await tester.tap(find.text('달력'));
+    await tester.pumpAndSettle();
+    final start = monthOfWeek(tasks.selectedWeek);
+    await tester.tap(find.byKey(const Key('nextMonth')));
+    await tester.tap(find.byKey(const Key('nextMonth')));
+    await tester.pumpAndSettle();
+    expect(find.text(formatMonth(DateTime(start.year, start.month + 2))), findsOneWidget);
+    await tester.tap(find.byKey(const Key('prevMonth')));
+    await tester.pumpAndSettle();
+    expect(find.text(formatMonth(DateTime(start.year, start.month + 1))), findsOneWidget);
+    await tester.tap(find.byKey(const Key('monthTitle')));
+    await tester.pumpAndSettle();
+    final now = tasks.now();
+    expect(find.text(formatMonth(DateTime(now.year, now.month))), findsOneWidget);
+  });
 }
 
 class _FakeFiles implements BackupFiles {

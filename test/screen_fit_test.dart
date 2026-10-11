@@ -165,6 +165,17 @@ void main() {
         await expectReachable(tester, p, find.byKey(const Key('addTask')));
       });
 
+      testWidgets('month view full of long tasks', (tester) async {
+        apply(tester, p);
+        await pumpScreen(tester, const HomeScreen());
+        await addLongTasks();
+        await tester.tap(find.text('달력'));
+        await tester.pumpAndSettle();
+        await scrollThrough(tester);
+        await expectReachable(tester, p, find.byKey(const Key('nextMonth')));
+        await expectReachable(tester, p, find.byKey(const Key('addTask')));
+      });
+
       testWidgets('task editor', (tester) async {
         apply(tester, p);
         await pumpScreen(tester, const TaskEditorScreen());
