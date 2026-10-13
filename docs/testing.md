@@ -8,7 +8,7 @@ when the scenario tests landed. Keep it current when a layer changes.
 
 | Layer | What it checks | Where | Size | Time | Runs in |
 |---|---|---|---|---|---|
-| **Unit and widget tests** | The model, week maths, the provider (including races and user switches), Hive storage, local auth, backups, the painter, every screen flow with in-memory storage, and every screen in six device profiles (`screen_fit_test.dart`) | `test/` | 122 tests in 12 files | about 8 s | `scripts/test/check.sh`; CI on every push |
+| **Unit and widget tests** | The model, week maths, the provider (including races and user switches), Hive storage, local auth, backups, the painter, every screen flow with in-memory storage, and every screen in six device profiles (`screen_fit_test.dart`) | `test/` | 133 tests in 13 files | about 8 s | `scripts/test/check.sh`; CI on every push |
 | **Scenario tests** | The real app on real storage (Hive on Android, IndexedDB on web), real fonts and a real screen size: whole user journeys with a screenshot per step | `integration_test/` | 6 scenarios | about 3 min on the emulator, about 5 min in local Chrome, about 7 min in CI | `scripts/test/scenario.sh` (emulator) or `--web`; CI runs `--web` on every push |
 
 The layers split the work on purpose. Combinations and edge cases (every
